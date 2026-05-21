@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PvPStrip — Play. Win. Strip.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #FF1744;
+    --red-dim: #8B0000;
+    --gold: #FFD700;
+    --gold-dim: #B8960C;
+    --white: #F5F0E8;
+    --off: #1A1A1A;
+    --dark: #0D0D0D;
+    --darker: #080808;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--darker);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, background 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,23,68,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.12s ease;
+  }
+  body:hover .cursor { transform: translate(-50%, -50%) scale(1); }
+
+  /* SCANLINE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* NOISE TEXTURE */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 99;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.95), transparent);
+    backdrop-filter: blur(2px);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    text-decoration: none;
+    position: relative;
+  }
+  .nav-logo span { color: var(--red); }
+  .nav-logo::after {
+    content: '●';
+    font-size: 0.4em;
+    color: var(--red);
+    position: absolute;
+    top: 4px;
+    margin-left: 4px;
+    animation: blink 1.2s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+    align-items: center;
+  }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.55);
+    text-decoration: none;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--red);
+    transition: width 0.25s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-cta {
+    background: var(--red);
+    color: var(--white) !important;
+    padding: 8px 20px;
+    font-family: 'Space Mono', monospace !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.12em !important;
+    border: none;
+    cursor: none;
+    transition: background 0.2s, transform 0.1s !important;
+  }
+  .nav-cta::after { display: none !important; }
+  .nav-cta:hover { background: #cc0033 !important; transform: scale(1.04) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 0 48px;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 70% 50%, rgba(255,23,68,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(255,215,0,0.05) 0%, transparent 60%),
+      linear-gradient(135deg, #0D0D0D 0%, #0a0000 50%, #0D0D0D 100%);
+  }
+
+  /* Animated grid lines */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,23,68,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,23,68,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove {
+    0% { transform: perspective(500px) rotateX(10deg) translateY(0); }
+    100% { transform: perspective(500px) rotateX(10deg) translateY(60px); }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+  }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-tag::before {
+    content: '';
+    display: block;
+    width: 40px; height: 1px;
+    background: var(--red);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 12vw, 11rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    margin-bottom: 28px;
+    animation: fadeUp 0.8s 0.15s ease both;
+  }
+  .hero-title .red { color: var(--red); }
+  .hero-title .stroke {
+    -webkit-text-stroke: 1px var(--white);
+    color: transparent;
+  }
+
+  /* Glitch effect on title */
+  .glitch {
+    position: relative;
+  }
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    opacity: 0;
+  }
+  .glitch::before {
+    color: var(--red);
+    clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%);
+    animation: glitch1 4s 2s infinite;
+  }
+  .glitch::after {
+    color: #00ffff;
+    clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+    animation: glitch2 4s 2.1s infinite;
+  }
+  @keyframes glitch1 {
+    0%,90%,100%{opacity:0;transform:none}
+    92%{opacity:1;transform:translateX(-4px)}
+    94%{opacity:0}
+    96%{opacity:1;transform:translateX(4px)}
+    98%{opacity:0}
+  }
+  @keyframes glitch2 {
+    0%,90%,100%{opacity:0;transform:none}
+    92%{opacity:1;transform:translateX(4px)}
+    94%{opacity:0}
+    96%{opacity:1;transform:translateX(-4px)}
+    98%{opacity:0}
+  }
+
+  .hero-sub {
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: rgba(245,240,232,0.65);
+    line-height: 1.5;
+    max-width: 480px;
+    margin-bottom: 44px;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+  .hero-sub strong { color: var(--white); font-weight: 600; }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    animation: fadeUp 0.8s 0.45s ease both;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: var(--white);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+    padding: 16px 40px;
+    border: none;
+    cursor: none;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.4s;
+  }
+  .btn-primary:hover::before { left: 100%; }
+  .btn-primary:hover { transform: translateY(-2px); }
+
+  .btn-outline {
+    border: 1px solid rgba(245,240,232,0.25);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    padding: 16px 32px;
+    text-decoration: none;
+    display: inline-block;
+    text-transform: uppercase;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--red); color: var(--red); }
+
+  .hero-stats {
+    position: absolute;
+    right: 48px;
+    bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    animation: fadeUp 0.8s 0.6s ease both;
+  }
+  .stat-item { text-align: right; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    line-height: 1;
+    color: var(--red);
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,240,232,0.4);
+    text-transform: uppercase;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 48px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: rgba(245,240,232,0.3);
+    text-transform: uppercase;
+    animation: fadeUp 1s 1s ease both;
+  }
+  .scroll-line {
+    width: 40px; height: 1px;
+    background: rgba(245,240,232,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: var(--red);
+    animation: scrollPulse 2s ease infinite;
+  }
+  @keyframes scrollPulse { 0%{left:-100%} 100%{left:100%} }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* LIVE TICKER */
+  .ticker {
+    background: var(--red);
+    padding: 10px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+  }
+  .ticker-inner {
+    display: inline-flex;
+    animation: ticker 30s linear infinite;
+  }
+  .ticker-item {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0 48px;
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .ticker-item::before {
+    content: '★';
+    font-size: 0.7em;
+  }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* SECTION COMMON */
+  section { position: relative; }
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before {
+    content: '//';
+    opacity: 0.5;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 0.95;
+    margin-bottom: 24px;
+  }
+
+  /* HOW IT WORKS */
+  .hiw {
+    padding: 120px 0;
+    background: linear-gradient(to bottom, var(--darker), var(--dark));
+  }
+
+  .hiw-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    margin-top: 64px;
+  }
+
+  .hiw-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 24px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--glass-border);
+    position: relative;
+    transition: padding-left 0.3s;
+  }
+  .step:first-child { border-top: 1px solid var(--glass-border); }
+  .step:hover { padding-left: 12px; }
+  .step:hover .step-num { color: var(--red); }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    line-height: 1;
+    color: rgba(245,240,232,0.1);
+    min-width: 60px;
+    transition: color 0.3s;
+  }
+
+  .step-content h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+  .step-content p {
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgba(245,240,232,0.55);
+    line-height: 1.6;
+  }
+
+  .hiw-visual {
+    position: relative;
+    aspect-ratio: 9/12;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+  }
+
+  /* Fake screen with game UI */
+  .screen-mockup {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .screen-header {
+    background: rgba(255,23,68,0.15);
+    border-bottom: 1px solid rgba(255,23,68,0.2);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--red);
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    background: var(--red);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    animation: blink 1s step-end infinite;
+  }
+  .screen-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%);
+    position: relative;
+  }
+  .players-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .player-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 12px 16px;
+    text-align: center;
+    width: 46%;
+  }
+  .player-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.05em;
+  }
+  .player-hp {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--red);
+    margin-top: 4px;
+  }
+  .hp-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    margin-top: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hp-fill {
+    height: 100%;
+    background: var(--red);
+    animation: hpPulse 3s ease infinite alternate;
+  }
+  @keyframes hpPulse {
+    0% { width: 75%; }
+    100% { width: 30%; }
+  }
+  .hp-fill-2 {
+    height: 100%;
+    background: #FFD700;
+    animation: hpPulse2 3s ease infinite alternate;
+  }
+  @keyframes hpPulse2 {
+    0% { width: 90%; }
+    100% { width: 65%; }
+  }
+
+  .vs-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    background: rgba(0,0,0,0.7);
+    border: 1px solid var(--gold-dim);
+    padding: 4px 10px;
+  }
+
+  .prize-strip {
+    background: rgba(255,215,0,0.08);
+    border: 1px solid rgba(255,215,0,0.15);
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .screen-overlay-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,23,68,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,23,68,0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+  }
+
+  /* GAMES / CHALLENGES */
+  .challenges {
+    padding: 120px 0;
+    background: var(--darker);
+  }
+
+  .challenges-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+  }
+
+  .challenge-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .challenge-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 36px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: none;
+  }
+  .challenge-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .challenge-card:hover { border-color: rgba(255,23,68,0.3); transform: translateY(-4px); }
+  .challenge-card:hover::before { transform: scaleX(1); }
+  .challenge-card.featured {
+    grid-column: span 2;
+    background: linear-gradient(135deg, rgba(255,23,68,0.08), rgba(255,23,68,0.02));
+    border-color: rgba(255,23,68,0.2);
+  }
+  .challenge-card.featured::before { transform: scaleX(1); }
+
+  .challenge-icon {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .challenge-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .challenge-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+  }
+  .challenge-desc {
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: rgba(245,240,232,0.5);
+    line-height: 1.6;
+  }
+  .challenge-prize {
+    margin-top: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    border: 1px solid rgba(255,215,0,0.2);
+    padding: 6px 14px;
+  }
+  .challenge-prize::before { content: '🏆'; font-size: 0.85em; }
+
+  /* LEADERBOARD */
+  .leaderboard {
+    padding: 120px 0;
+    background: linear-gradient(to bottom, var(--darker), #0a0202);
+  }
+
+  .lb-table {
+    margin-top: 60px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+  }
+  .lb-header {
+    display: grid;
+    grid-template-columns: 60px 1fr 120px 120px 100px;
+    padding: 14px 24px;
+    background: rgba(255,23,68,0.08);
+    border-bottom: 1px solid var(--glass-border);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,240,232,0.35);
+    text-transform: uppercase;
+  }
+  .lb-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 120px 120px 100px;
+    padding: 18px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    align-items: center;
+    transition: background 0.2s;
+    cursor: none;
+  }
+  .lb-row:hover { background: var(--glass); }
+  .lb-row.top-1 { background: rgba(255,215,0,0.05); border-left: 2px solid var(--gold); }
+  .lb-row.top-2 { background: rgba(192,192,192,0.04); border-left: 2px solid #C0C0C0; }
+  .lb-row.top-3 { background: rgba(205,127,50,0.04); border-left: 2px solid #CD7F32; }
+
+  .lb-rank {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    color: rgba(245,240,232,0.2);
+  }
+  .lb-row.top-1 .lb-rank { color: var(--gold); }
+  .lb-row.top-2 .lb-rank { color: #C0C0C0; }
+  .lb-row.top-3 .lb-rank { color: #CD7F32; }
+
+  .lb-player {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .lb-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--red-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .lb-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .lb-handle {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: rgba(245,240,232,0.3);
+  }
+  .lb-wins {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    color: var(--red);
+  }
+  .lb-strips {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    color: rgba(245,240,232,0.4);
+  }
+  .lb-prize {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+  }
+
+  /* PRIZES */
+  .prizes {
+    padding: 120px 0;
+    background: var(--darker);
+  }
+
+  .prizes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+
+  .prize-card {
+    padding: 48px 28px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .prize-card:hover { transform: translateY(-6px); }
+  .prize-card.featured-prize {
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,23,68,0.05));
+    border-color: rgba(255,215,0,0.2);
+  }
+  .prize-rank-badge {
+    position: absolute;
+    top: 0; right: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    background: var(--red);
+    padding: 4px 12px;
+  }
+  .prize-icon-large {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 16px;
+  }
+  .prize-tier {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .prize-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+  .prize-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: rgba(245,240,232,0.4);
+  }
+
+  /* JOIN / CTA SECTION */
+  .join {
+    padding: 160px 0;
+    background: linear-gradient(135deg, #0D0D0D 0%, #1a0000 50%, #0D0D0D 100%);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .join::before {
+    content: 'PVP';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40vw;
+    color: rgba(255,23,68,0.02);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .join-content { position: relative; z-index: 2; }
+  .join-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 0.9;
+    margin-bottom: 28px;
+  }
+  .join-title .accent { color: var(--red); }
+  .join-sub {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: rgba(245,240,232,0.5);
+    max-width: 480px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+  }
+  .join-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .x-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: rgba(245,240,232,0.5);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .x-link:hover { color: var(--white); }
+  .x-icon {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+  }
+  .x-link:hover .x-icon { background: rgba(255,255,255,0.15); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--glass-border);
+    padding: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--darker);
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.05em;
+  }
+  .footer-logo span { color: var(--red); }
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    color: rgba(245,240,232,0.25);
+    text-transform: uppercase;
+  }
+  .footer-links {
+    display: flex;
+    gap: 28px;
+  }
+  .footer-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    color: rgba(245,240,232,0.3);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--red); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(8px);
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--dark);
+    border: 1px solid var(--glass-border);
+    border-top: 2px solid var(--red);
+    width: 480px;
+    max-width: 90vw;
+    padding: 48px;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+    position: relative;
+  }
+  .modal-overlay.active .modal { transform: translateY(0); }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none;
+    border: none;
+    color: rgba(245,240,232,0.4);
+    font-size: 1.2rem;
+    cursor: none;
+    transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--red); }
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
+  .modal-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(245,240,232,0.4);
+    letter-spacing: 0.12em;
+    margin-bottom: 32px;
+    text-transform: uppercase;
+  }
+  .modal-field {
+    margin-bottom: 16px;
+  }
+  .modal-field label {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,240,232,0.4);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .modal-field input, .modal-field select {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-border);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.1rem;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    cursor: none;
+    -webkit-appearance: none;
+  }
+  .modal-field input:focus, .modal-field select:focus { border-color: var(--red); }
+  .modal-field select option { background: var(--dark); }
+  .modal-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    color: rgba(245,240,232,0.25);
+    letter-spacing: 0.08em;
+    line-height: 1.6;
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+  .modal-submit {
+    width: 100%;
+    background: var(--red);
+    border: none;
+    color: var(--white);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+    padding: 16px;
+    cursor: none;
+    transition: background 0.2s;
+  }
+  .modal-submit:hover { background: #cc0033; }
+  .modal-success {
+    text-align: center;
+    display: none;
+  }
+  .modal-success.visible { display: block; }
+  .modal-success-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+  }
+  .modal-success h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--red);
+    margin-bottom: 8px;
+  }
+  .modal-success p {
+    font-size: 0.95rem;
+    color: rgba(245,240,232,0.5);
+    line-height: 1.6;
+  }
+
+  /* EPISODE SCHEDULE */
+  .schedule {
+    padding: 120px 0;
+    background: var(--dark);
+  }
+  .schedule-list {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ep-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 180px 120px;
+    align-items: center;
+    padding: 24px 28px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    transition: border-color 0.2s, background 0.2s;
+    cursor: none;
+    gap: 20px;
+  }
+  .ep-row:hover { border-color: rgba(255,23,68,0.25); background: rgba(255,23,68,0.04); }
+  .ep-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: rgba(245,240,232,0.4);
+    text-transform: uppercase;
+  }
+  .ep-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.03em;
+  }
+  .ep-game {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: rgba(245,240,232,0.3);
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+  .ep-prize {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+  }
+  .ep-status {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .ep-status.live { color: var(--red); }
+  .ep-status.upcoming { color: rgba(245,240,232,0.3); }
+  .ep-status.live::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* AGE GATE */
+  .age-gate {
+    position: fixed;
+    inset: 0;
+    background: var(--darker);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 40px;
+    transition: opacity 0.4s;
+  }
+  .age-gate.gone { opacity: 0; pointer-events: none; }
+  .age-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+  .age-logo span { color: var(--red); }
+  .age-warning {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: rgba(245,240,232,0.3);
+    text-transform: uppercase;
+    margin-bottom: 48px;
+  }
+  .age-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 16px;
+  }
+  .age-sub {
+    font-size: 1rem;
+    color: rgba(245,240,232,0.45);
+    max-width: 380px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+  .age-btns {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+  .age-yes {
+    background: var(--red);
+    border: none;
+    color: var(--white);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+    padding: 16px 48px;
+    cursor: none;
+    transition: background 0.2s;
+  }
+  .age-yes:hover { background: #cc0033; }
+  .age-no {
+    background: none;
+    border: 1px solid var(--glass-border);
+    color: rgba(245,240,232,0.4);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    padding: 16px 32px;
+    cursor: none;
+    text-transform: uppercase;
+    transition: border-color 0.2s;
+  }
+  .age-no:hover { border-color: rgba(245,240,232,0.2); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 0 24px; min-height: 100svh; }
+    .hero-stats { display: none; }
+    .scroll-hint { left: 24px; }
+    .section-inner { padding: 0 24px; }
+    .hiw-grid { grid-template-columns: 1fr; gap: 48px; }
+    .hiw-visual { aspect-ratio: 16/9; }
+    .challenge-grid { grid-template-columns: 1fr; }
+    .challenge-card.featured { grid-column: auto; }
+    .prizes-grid { grid-template-columns: repeat(2, 1fr); }
+    .lb-header, .lb-row { grid-template-columns: 40px 1fr 80px 80px; }
+    .lb-header .col-prize, .lb-row .lb-prize { display: none; }
+    .ep-row { grid-template-columns: 1fr 1fr; }
+    .ep-date { display: none; }
+    .footer { flex-direction: column; gap: 24px; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+    .join-actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AGE GATE -->
+<div class="age-gate" id="ageGate">
+  <div class="age-logo">PvP<span>Strip</span></div>
+  <div class="age-warning">18+ Content — Adult Entertainment</div>
+  <h2 class="age-title">Are You 18 or Older?</h2>
+  <p class="age-sub">PvPStrip contains mature content intended for adults only. By entering, you confirm you are of legal age in your region.</p>
+  <div class="age-btns">
+    <button class="age-yes" onclick="enterSite()">Yes, I'm 18+</button>
+    <button class="age-no" onclick="window.location.href='https://google.com'">No, Exit</button>
+  </div>
+</div>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">PvP<span>Strip</span></a>
+  <ul class="nav-links">
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#challenges">Games</a></li>
+    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#leaderboard">Leaderboard</a></li>
+    <li><a href="#prizes">Prizes</a></li>
+    <li><a href="#" class="nav-cta" onclick="openModal()">Watch Now</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Live Every Friday Night · Adults Only · 18+</div>
+    <h1 class="hero-title">
+      <span class="glitch" data-text="PLAY.">PLAY.</span><br>
+      <span class="red glitch" data-text="WIN.">WIN.</span><br>
+      <span class="stroke">STRIP.</span>
+    </h1>
+    <p class="hero-sub">
+      The <strong>most electric gaming show on the internet.</strong> Girls go head‑to‑head in PvP challenges — loser strips, winner takes the prize. No edits. No script.
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary" onclick="openModal(); return false;">Join & Watch</a>
+      <a href="https://x.com/pvpstrip" target="_blank" class="btn-outline">@pvpstrip on X</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">50K+</div>
+      <div class="stat-label">Followers on X</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">200+</div>
+      <div class="stat-label">Episodes Aired</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">30+</div>
+      <div class="stat-label">Players Featured</div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll to explore
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner" id="tickerInner">
+    <span class="ticker-item">New Episode Every Friday</span>
+    <span class="ticker-item">Full Library Members Only</span>
+    <span class="ticker-item">Real Stakes. Real Games.</span>
+    <span class="ticker-item">PvP Like You've Never Seen</span>
+    <span class="ticker-item">Follow @pvpstrip on X</span>
+    <span class="ticker-item">Winner Takes All</span>
+    <span class="ticker-item">New Episode Every Friday</span>
+    <span class="ticker-item">Full Library Members Only</span>
+    <span class="ticker-item">Real Stakes. Real Games.</span>
+    <span class="ticker-item">PvP Like You've Never Seen</span>
+    <span class="ticker-item">Follow @pvpstrip on X</span>
+    <span class="ticker-item">Winner Takes All</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="hiw" id="how-it-works">
+  <div class="section-inner">
+    <div class="section-label">The Format</div>
+    <h2 class="section-title">How PvPStrip Works</h2>
+    <div class="hiw-grid">
+      <div class="hiw-steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h3>Two Players Enter</h3>
+            <p>Two female players face off in a randomly selected PvP game — from fighting games to arcade classics to trivia showdowns.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h3>Loser Strips</h3>
+            <p>Every round, the losing player removes a piece of clothing. The game continues until one player has nothing left to give — or surrenders.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h3>Winner Claims the Prize</h3>
+            <p>The champion walks away with cash, gifts, brand deals, or this season's grand prize. No pity prizes. No participation trophies.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h3>Members Watch Uncut</h3>
+            <p>Tease clips drop on X. Full uncut episodes — no bleeps, no edits — live exclusively inside the CUBE membership.</p>
+          </div>
+        </div>
+      </div>
+      <div class="hiw-visual">
+        <div class="screen-mockup">
+          <div class="screen-header">
+            <span><span class="live-dot"></span>LIVE · EP.47 · FRIDAY NIGHT PVP</span>
+            <span>23:11 · CH.1</span>
+          </div>
+          <div class="screen-body">
+            <div class="screen-overlay-grid"></div>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; position:relative; padding: 20px 0;">
+              <div style="text-align:center; position:relative; z-index:2;">
+                <div style="font-family:'Bebas Neue',sans-serif; font-size:5rem; line-height:1; color:rgba(255,23,68,0.15); letter-spacing:0.05em;">ROUND<br>3</div>
+                <div style="font-family:'Space Mono',monospace; font-size:0.65rem; color:rgba(245,240,232,0.25); letter-spacing:0.2em; margin-top:8px;">STREET FIGHTER VI</div>
+              </div>
+            </div>
+            <div class="players-bar">
+              <div class="player-card">
+                <div class="player-name">KIARA</div>
+                <div class="player-hp">HP 34%</div>
+                <div class="hp-bar"><div class="hp-fill"></div></div>
+              </div>
+              <div style="position:relative; width:8%;">
+                <div class="vs-badge">VS</div>
+              </div>
+              <div class="player-card">
+                <div class="player-name">NOVA</div>
+                <div class="player-hp">HP 71%</div>
+                <div class="hp-bar"><div class="hp-fill-2"></div></div>
+              </div>
+            </div>
+            <div class="prize-strip">
+              <span>🏆 PRIZE POOL</span>
+              <span>₦150,000 CASH + CUBE ACCESS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHALLENGES -->
+<section class="challenges" id="challenges">
+  <div class="section-inner">
+    <div class="challenges-header">
+      <div>
+        <div class="section-label">The Games</div>
+        <h2 class="section-title">PvP Challenge Formats</h2>
+      </div>
+      <a href="#" class="btn-outline" onclick="openModal(); return false;">View Full Lineup</a>
+    </div>
+    <div class="challenge-grid">
+      <div class="challenge-card featured">
+        <span class="challenge-icon">🕹️</span>
+        <div class="challenge-label">Season Special</div>
+        <div class="challenge-title">Fighting Game Championship</div>
+        <p class="challenge-desc">Two players. One controller each. Street Fighter, Tekken, Mortal Kombat — best of five rounds. Every loss costs a layer. The final boss format.</p>
+        <div class="challenge-prize">₦250,000 Season Prize</div>
+      </div>
+      <div class="challenge-card">
+        <span class="challenge-icon">🎯</span>
+        <div class="challenge-label">Weekly</div>
+        <div class="challenge-title">Arcade Showdown</div>
+        <p class="challenge-desc">Score-based retro classics. Miss the mark, lose the outfit. Fast, ruthless, hilarious.</p>
+        <div class="challenge-prize">₦80,000 + Gifts</div>
+      </div>
+      <div class="challenge-card">
+        <span class="challenge-icon">🧠</span>
+        <div class="challenge-label">Wednesday Edition</div>
+        <div class="challenge-title">Trivia Strip</div>
+        <p class="challenge-desc">Hot takes, pop culture, gaming knowledge. Wrong answer? You know the deal. Fastest fingers and sharpest minds win dressed.</p>
+        <div class="challenge-prize">₦60,000 Cash</div>
+      </div>
+      <div class="challenge-card">
+        <span class="challenge-icon">🎮</span>
+        <div class="challenge-label">Weekend Drop</div>
+        <div class="challenge-title">Console Wars</div>
+        <p class="challenge-desc">FIFA, NBA 2K, Mario Kart. Audience votes the game. Players gear up, loser pays the price.</p>
+        <div class="challenge-prize">₦100,000 + Brand Deal</div>
+      </div>
+      <div class="challenge-card">
+        <span class="challenge-icon">🎲</span>
+        <div class="challenge-label">Monthly Bonus</div>
+        <div class="challenge-title">Chaos Round</div>
+        <p class="challenge-desc">Random game selected live by the audience during the stream. No prep. No excuses. Pure chaos.</p>
+        <div class="challenge-prize">Mystery Prize Box</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section class="schedule" id="schedule">
+  <div class="section-inner">
+    <div class="section-label">Upcoming</div>
+    <h2 class="section-title">Episode Schedule</h2>
+    <div class="schedule-list">
+      <div class="ep-row">
+        <div class="ep-date">Fri, May 23</div>
+        <div>
+          <div class="ep-title">Kiara vs. Nova — Rematch</div>
+          <div class="ep-game">Street Fighter VI · Best of 7</div>
+        </div>
+        <div class="ep-prize">₦150,000 Cash Prize</div>
+        <div class="ep-status live">Live Tonight</div>
+      </div>
+      <div class="ep-row">
+        <div class="ep-date">Wed, May 28</div>
+        <div>
+          <div class="ep-title">Trivia Night — Season Finale Qualifier</div>
+          <div class="ep-game">General Trivia + Gaming Knowledge</div>
+        </div>
+        <div class="ep-prize">₦80,000 + Wildcard Slot</div>
+        <div class="ep-status upcoming">Upcoming</div>
+      </div>
+      <div class="ep-row">
+        <div class="ep-date">Fri, May 30</div>
+        <div>
+          <div class="ep-title">Console Wars — Audience Choice Night</div>
+          <div class="ep-game">Game TBD by Audience Vote</div>
+        </div>
+        <div class="ep-prize">₦120,000 + Merch Bundle</div>
+        <div class="ep-status upcoming">Upcoming</div>
+      </div>
+      <div class="ep-row">
+        <div class="ep-date">Fri, Jun 6</div>
+        <div>
+          <div class="ep-title">SEASON 3 FINALE — Championship Match</div>
+          <div class="ep-game">Fighting Game · All Formats · Grand Stage</div>
+        </div>
+        <div class="ep-prize">₦250,000 Grand Prize</div>
+        <div class="ep-status upcoming">Season Finale</div>
+      </div>
+      <div class="ep-row">
+        <div class="ep-date">Fri, Jun 13</div>
+        <div>
+          <div class="ep-title">Season 4 Debut — New Players, New Rules</div>
+          <div class="ep-game">Format Reveal TBA</div>
+        </div>
+        <div class="ep-prize">₦200,000 Season Prize Pool</div>
+        <div class="ep-status upcoming">Coming Soon</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEADERBOARD -->
+<section class="leaderboard" id="leaderboard">
+  <div class="section-inner">
+    <div class="section-label">Season 3</div>
+    <h2 class="section-title">Player Leaderboard</h2>
+    <div class="lb-table">
+      <div class="lb-header">
+        <div>#</div>
+        <div>Player</div>
+        <div>Wins</div>
+        <div>Opponents Stripped</div>
+        <div class="col-prize">Prize Earned</div>
+      </div>
+      <div class="lb-row top-1">
+        <div class="lb-rank">1</div>
+        <div class="lb-player">
+          <div class="lb-avatar" style="background:#8B0000;">N</div>
+          <div>
+            <div class="lb-name">Nova</div>
+            <div class="lb-handle">@nova.pvp</div>
+          </div>
+        </div>
+        <div class="lb-wins">14</div>
+        <div class="lb-strips">11</div>
+        <div class="lb-prize">₦310,000</div>
+      </div>
+      <div class="lb-row top-2">
+        <div class="lb-rank">2</div>
+        <div class="lb-player">
+          <div class="lb-avatar" style="background:#3d0a47;">K</div>
+          <div>
+            <div class="lb-name">Kiara</div>
+            <div class="lb-handle">@kiarastrikes</div>
+          </div>
+        </div>
+        <div class="lb-wins">12</div>
+        <div class="lb-strips">9</div>
+        <div class="lb-prize">₦220,000</div>
+      </div>
+      <div class="lb-row top-3">
+        <div class="lb-rank">3</div>
+        <div class="lb-player">
+          <div class="lb-avatar" style="background:#0a2d0a;">Z</div>
+          <div>
+            <div class="lb-name">Zara</div>
+            <div class="lb-handle">@zara.gg</div>
+          </div>
+        </div>
+        <div class="lb-wins">10</div>
+        <div class="lb-strips">7</div>
+        <div class="lb-prize">₦155,000</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank">4</div>
+        <div class="lb-player">
+          <div class="lb-avatar" style="background:#2a1a08;">A</div>
+          <div>
+            <div class="lb-name">Amara</div>
+            <div class="lb-handle">@amara_plays</div>
+          </div>
+        </div>
+        <div class="lb-wins">8</div>
+        <div class="lb-strips">5</div>
+        <div class="lb-prize">₦90,000</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank">5</div>
+        <div class="lb-player">
+          <div class="lb-avatar" style="background:#08152a;">L</div>
+          <div>
+            <div class="lb-name">Lyra</div>
+            <div class="lb-handle">@lyra_vs</div>
+          </div>
+        </div>
+        <div class="lb-wins">6</div>
+        <div class="lb-strips">4</div>
+        <div class="lb-prize">₦60,000</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIZES -->
+<section class="prizes" id="prizes">
+  <div class="section-inner">
+    <div class="section-label">Winner's Circle</div>
+    <h2 class="section-title">What Winners Take Home</h2>
+    <div class="prizes-grid">
+      <div class="prize-card featured-prize">
+        <div class="prize-rank-badge">GRAND</div>
+        <span class="prize-icon-large">👑</span>
+        <div class="prize-tier">Season Champion</div>
+        <div class="prize-name">₦250,000 Cash</div>
+        <div class="prize-value">+ Brand Partnership + CUBE VIP Lifetime</div>
+      </div>
+      <div class="prize-card">
+        <span class="prize-icon-large">💵</span>
+        <div class="prize-tier">Weekly Winner</div>
+        <div class="prize-name">Cash Prize</div>
+        <div class="prize-value">₦60,000 – ₦150,000 per episode</div>
+      </div>
+      <div class="prize-card">
+        <span class="prize-icon-large">🎁</span>
+        <div class="prize-tier">Mystery Drops</div>
+        <div class="prize-name">Gift Bundles</div>
+        <div class="prize-value">Luxury items, tech, beauty hauls</div>
+      </div>
+      <div class="prize-card">
+        <span class="prize-icon-large">🌐</span>
+        <div class="prize-tier">Members Exclusive</div>
+        <div class="prize-name">CUBE Access</div>
+        <div class="prize-value">Full CUBE membership + STRZ tokens</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN CTA -->
+<section class="join" id="join">
+  <div class="join-content">
+    <div class="section-label" style="justify-content:center;">Exclusive Access</div>
+    <h2 class="join-title">Ready to<br><span class="accent">Watch?</span></h2>
+    <p class="join-sub">Tease clips on X. Uncut, unfiltered full episodes exclusively for CUBE members. Join the waitlist now.</p>
+    <div class="join-actions">
+      <a href="#" class="btn-primary" onclick="openModal(); return false;">Join the Waitlist</a>
+      <a href="https://x.com/pvpstrip" target="_blank" class="x-link">
+        <div class="x-icon">𝕏</div>
+        Follow @pvpstrip for free clips
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">PvP<span>Strip</span></div>
+  <div class="footer-copy">© 2025 PvPStrip · A CUBE Production · 18+ Only · Adults Only</div>
+  <div class="footer-links">
+    <a href="#">Terms</a>
+    <a href="#">Privacy</a>
+    <a href="#">18 U.S.C. 2257</a>
+    <a href="https://x.com/pvpstrip" target="_blank">@pvpstrip</a>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalForm">
+      <div class="modal-title">Join the Waitlist</div>
+      <div class="modal-sub">Members only · Uncut episodes · Exclusive access</div>
+      <div class="modal-field">
+        <label>Your Name</label>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+      </div>
+      <div class="modal-field">
+        <label>Email Address</label>
+        <input type="email" id="emailInput" placeholder="your@email.com">
+      </div>
+      <div class="modal-field">
+        <label>How'd You Hear About Us?</label>
+        <select id="sourceInput">
+          <option value="">Select one</option>
+          <option>X / Twitter (@pvpstrip)</option>
+          <option>CUBE Platform</option>
+          <option>Friend Referral</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="modal-note">By joining you confirm you are 18+ and consent to receive PvPStrip membership updates. Content is for adults only.</div>
+      <button class="modal-submit" onclick="submitWaitlist()">Secure My Spot →</button>
+    </div>
+    <div class="modal-success" id="modalSuccess">
+      <div class="modal-success-icon">🎮</div>
+      <h3>You're In.</h3>
+      <p>We'll hit you with access details before the next drop. Follow <strong>@pvpstrip</strong> on X for free tease clips in the meantime.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) *.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a, button, .challenge-card, .ep-row, .lb-row').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%,-50%) scale(2)';
+      ring.style.transform = 'translate(-50%,-50%) scale(1.5)';
+      ring.style.borderColor = 'rgba(255,23,68,0.8)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+      ring.style.transform = 'translate(-50%,-50%) scale(1)';
+      ring.style.borderColor = 'rgba(255,23,68,0.5)';
+    });
+  });
+
+  // Age gate
+  function enterSite() {
+    document.getElementById('ageGate').classList.add('gone');
+    setTimeout(() => document.getElementById('ageGate').style.display = 'none', 400);
+  }
+
+  // Modal
+  function openModal() {
+    document.getElementById('modal').classList.add('active');
+  }
+  function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+  }
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  function submitWaitlist() {
+    const name = document.getElementById('nameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    if (!name || !email) { 
+      document.getElementById('nameInput').style.borderColor = name ? '' : 'var(--red)';
+      document.getElementById('emailInput').style.borderColor = email ? '' : 'var(--red)';
+      return;
+    }
+    document.getElementById('modalForm').style.display = 'none';
+    document.getElementById('modalSuccess').classList.add('visible');
+  }
+
+  // Keyboard close
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Intersection observer for section animations
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.challenge-card, .step, .ep-row, .lb-row, .prize-card').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = `opacity 0.5s ${i * 0.07}s ease, transform 0.5s ${i * 0.07}s ease, border-color 0.3s, background 0.2s, padding-left 0.3s`;
+    io.observe(el);
+  });
+</script>
+</body>
+</html>
