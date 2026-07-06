@@ -15,25 +15,26 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-s
 import { getFunctions } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js";
 
 // ---------- FIREBASE CONFIG ----------
-// TODO: replace with your real DettyVerse web app config
+// ---------- FIREBASE CONFIG ----------
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "AIzaSyD_GjkTox5tum9o4AupO0LeWzjTocJg8RI",
   authDomain: "dettyverse.firebaseapp.com",
   projectId: "dettyverse",
   storageBucket: "dettyverse.firebasestorage.app",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  messagingSenderId: "1036459652488",
+  appId: "1:1036459652488:web:e8910172ed16e9cac9b63d",
+  measurementId: "G-NX2KWZW85V"
 };
 
 // ====================== DATABASE SELECTION ======================
 // Change this one line per product — everything else in this file stays the same.
-const TARGET_DATABASE = "cassava"; // e.g. "cassava", "cctv", "chrge", "cubeology", "gring"
+const TARGET_DATABASE = "cctv"; // e.g. "cassava", "cctv", "cube", "bidbanta", "gring"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app, TARGET_DATABASE);
 const storage = getStorage(app);
-const functions = getFunctions(app, "europe-west1"); // matches DettyVerse's standard functions region
+const functions = getFunctions(app, "europe-west1"); // closer region for Nigeria/Ghana traffic
 
 console.log(`📦 Connected to Firestore database: ${TARGET_DATABASE}`);
 console.log("☁️ Functions region: europe-west1");
