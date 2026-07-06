@@ -1,24 +1,25 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cassava — Furniture for the private hours</title>
-<meta name="description" content="Cassava. Luxury seating, and a private atelier for those invited further.">
+<title>Cassava Couch — Furniture for the private hours</title>
+<meta name="description" content="Cassava Couch. Luxury seating, and a private atelier for those invited further.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --matte-black:#0c0b09;
-    --espresso:#241810;
-    --walnut:#4a3020;
-    --champagne:#c6a15b;
-    --champagne-dim:#8f7748;
-    --ivory:#ede6d8;
-    --ivory-dim:rgba(237,230,216,.58);
-    --olive:#332d22;
-    --hairline:rgba(198,161,91,.18);
+    /* Light "milk" base */
+    --matte-black:#f7f2e9;       /* base page bg (kept var name for minimal churn — now means "base surface") */
+    --espresso:#efe4d2;          /* secondary/alt section bg, one shade deeper cream */
+    --walnut:#6b4226;            /* mid-tone brown, used for decorative glows */
+    --champagne:#a8763c;         /* primary accent — muted antique gold/ochre, tuned for contrast on cream */
+    --champagne-dim:#8a6438;     /* secondary accent — deeper brown-gold for eyebrows/dividers */
+    --ivory:#2a1e14;             /* primary text — warm dark ink (was light cream text in the old dark theme) */
+    --ivory-dim:rgba(42,30,20,.6); /* secondary/muted text */
+    --hairline:rgba(91,58,36,.16); /* borders/dividers, brown-based */
     --ease:cubic-bezier(.22,.61,.36,1);
   }
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -31,7 +32,7 @@
     overflow-x:hidden;
     -webkit-font-smoothing:antialiased;
   }
-  ::selection{background:var(--champagne);color:var(--matte-black);}
+  ::selection{background:var(--champagne);color:#fbf8f2;}
   a{color:inherit;}
   img,svg{display:block;max-width:100%;}
   .eyebrow{
@@ -61,268 +62,269 @@
     align-items:center;
     gap:.6rem;
     cursor:pointer;
-    transition:background .35s var(--ease),color .35s var(--ease);
+    transition:background .35s var(--ease),color .35s var(--ease),opacity .3s;
   }
-  .btn:hover{background:var(--champagne);color:var(--matte-black);}
-  .btn.solid{background:var(--champagne);color:var(--matte-black);}
-  .btn.solid:hover{background:var(--ivory);border-color:var(--ivory);}
-  .btn.ghost{border-color:rgba(237,230,216,.28);color:var(--ivory-dim);}
+  .btn:hover{background:var(--champagne);color:#fbf8f2;}
+  .btn.solid{background:var(--champagne);color:#fbf8f2;}
+  .btn.solid:hover{opacity:.85;}
+  .btn.ghost{border-color:rgba(42,30,20,.22);color:var(--ivory-dim);}
   .btn.ghost:hover{border-color:var(--ivory);color:var(--ivory);background:transparent;}
 
-  /* grain */
-  body::before{
-    content:'';position:fixed;inset:0;z-index:400;pointer-events:none;opacity:.035;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
+/* grain */
+body::before{
+content:’’;position:fixed;inset:0;z-index:400;pointer-events:none;opacity:.03;
+background-image:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘140’ height=‘140’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘2’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’/%3E%3C/svg%3E”);
+}
 
-  /* NAV */
-  nav{
-    position:fixed;top:0;left:0;right:0;z-index:300;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:1.6rem 6vw;
-  }
-  nav::after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom, rgba(12,11,9,.85), transparent);}
-  .logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;}
-  .logo svg{width:30px;height:30px;}
-  .logo-word{font-family:'Fraunces',serif;font-size:1.05rem;letter-spacing:.02em;color:var(--ivory);}
-  .nav-links{display:flex;gap:2.4rem;list-style:none;}
-  .nav-links a{
-    font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
-    text-decoration:none;color:var(--ivory-dim);transition:color .3s;
-  }
-  .nav-links a:hover{color:var(--champagne);}
-  .nav-right{display:flex;align-items:center;gap:1.6rem;}
-  @media (max-width:860px){.nav-links{display:none;}}
+/* NAV */
+nav{
+position:fixed;top:0;left:0;right:0;z-index:300;
+display:flex;align-items:center;justify-content:space-between;
+padding:1.4rem 6vw;
+background:rgba(247,242,233,.82);
+backdrop-filter:blur(10px);
+border-bottom:1px solid var(–hairline);
+}
+.logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;}
+.logo svg{width:30px;height:30px;}
+.logo-word{font-family:‘Fraunces’,serif;font-size:1.05rem;letter-spacing:.02em;color:var(–ivory);}
+.nav-links{display:flex;gap:2.4rem;list-style:none;}
+.nav-links a{
+font-family:‘IBM Plex Mono’,monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+text-decoration:none;color:var(–ivory-dim);transition:color .3s;
+}
+.nav-links a:hover{color:var(–champagne);}
+.nav-right{display:flex;align-items:center;gap:1.6rem;}
+@media (max-width:860px){.nav-links{display:none;}}
 
-  /* MODE TOGGLE — the signature element */
-  .mode-toggle{
-    display:flex;align-items:center;gap:.65rem;
-    font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
-  }
-  .mode-toggle .lbl{color:var(--ivory-dim);transition:color .3s;}
-  .mode-toggle .lbl.active{color:var(--champagne);}
-  .toggle-track{
-    position:relative;width:52px;height:22px;border:1px solid var(--hairline);border-radius:11px;
-    cursor:pointer;background:rgba(255,255,255,.02);
-  }
-  .toggle-thumb{
-    position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
-    background:var(--champagne);transition:transform .45s var(--ease);
-  }
-  body.atelier .toggle-thumb{transform:translateX(28px);background:#cf8a4a;}
+/* MODE TOGGLE — the signature element */
+.mode-toggle{
+display:flex;align-items:center;gap:.65rem;
+font-family:‘IBM Plex Mono’,monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
+}
+.mode-toggle .lbl{color:var(–ivory-dim);transition:color .3s;}
+.mode-toggle .lbl.active{color:var(–champagne);}
+.toggle-track{
+position:relative;width:52px;height:22px;border:1px solid var(–hairline);border-radius:11px;
+cursor:pointer;background:rgba(0,0,0,.03);
+}
+.toggle-thumb{
+position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
+background:var(–champagne);transition:transform .45s var(–ease);
+}
+body.atelier .toggle-thumb{transform:translateX(28px);background:#8b3f22;}
 
-  /* HERO */
-  #hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;position:relative;padding-bottom:7vh;overflow:hidden;}
-  .hero-bg{
-    position:absolute;inset:0;
-    background:
-      radial-gradient(ellipse 55% 70% at 76% 22%, rgba(198,161,91,.10), transparent 60%),
-      radial-gradient(ellipse 60% 60% at 15% 85%, rgba(74,48,32,.5), transparent 55%),
-      linear-gradient(165deg, #100c09 0%, #0c0b09 55%, #150f0a 100%);
-    transition:background 1s var(--ease);
-  }
-  body.atelier .hero-bg{
-    background:
-      radial-gradient(ellipse 55% 70% at 76% 22%, rgba(207,138,74,.14), transparent 60%),
-      radial-gradient(ellipse 60% 60% at 15% 85%, rgba(51,45,34,.6), transparent 55%),
-      linear-gradient(165deg, #0e0b08 0%, #0a0908 55%, #120d08 100%);
-  }
-  .hero-grain-line{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.035) 2px,rgba(0,0,0,.035) 4px);pointer-events:none;}
-  .hero-inner{position:relative;z-index:2;}
-  .wrap.hero-inner{padding-top:14vh;}
-  .hero-title{font-size:clamp(3rem,8.4vw,7.2rem);margin:1.6rem 0 2.2rem;max-width:14ch;}
-  .hero-row{display:flex;justify-content:space-between;align-items:flex-end;gap:2.5rem;flex-wrap:wrap;}
-  .hero-desc{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:1.15rem;color:var(--ivory-dim);max-width:34ch;line-height:1.7;}
-  .hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;}
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;position:relative;padding-bottom:7vh;overflow:hidden;}
+.hero-bg{
+position:absolute;inset:0;
+background:
+radial-gradient(ellipse 55% 70% at 76% 22%, rgba(168,118,60,.14), transparent 60%),
+radial-gradient(ellipse 60% 60% at 15% 85%, rgba(107,66,38,.10), transparent 55%),
+linear-gradient(165deg, #fbf7ef 0%, #f6f0e3 55%, #f1e7d4 100%);
+}
+.hero-grain-line{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.02) 2px,rgba(0,0,0,.02) 4px);pointer-events:none;}
+.hero-inner{position:relative;z-index:2;}
+.wrap.hero-inner{padding-top:14vh;}
+.hero-title{font-size:clamp(3rem,8.4vw,7.2rem);margin:1.6rem 0 2.2rem;max-width:14ch;}
+.hero-row{display:flex;justify-content:space-between;align-items:flex-end;gap:2.5rem;flex-wrap:wrap;}
+.hero-desc{font-family:‘Fraunces’,serif;font-style:italic;font-weight:400;font-size:1.15rem;color:var(–ivory-dim);max-width:34ch;line-height:1.7;}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;}
 
-  /* couch signature svg */
-  .couch-mark{position:absolute;right:5vw;bottom:6vh;width:min(38vw,460px);opacity:.9;z-index:1;pointer-events:none;}
-  .couch-mark path,.couch-mark line{stroke:var(--champagne-dim);}
-  @media (max-width:860px){.couch-mark{display:none;}}
+/* couch signature svg */
+.couch-mark{position:absolute;right:5vw;bottom:6vh;width:min(38vw,460px);opacity:.85;z-index:1;pointer-events:none;}
+.couch-mark path,.couch-mark line{stroke:var(–walnut);}
+@media (max-width:860px){.couch-mark{display:none;}}
 
-  /* TICKER */
-  .ticker-wrap{overflow:hidden;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);padding:1rem 0;background:var(--espresso);}
-  .ticker-track{display:flex;gap:3rem;white-space:nowrap;animation:tick 26s linear infinite;width:max-content;}
-  .ticker-item{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ivory-dim);display:flex;align-items:center;gap:1.4rem;}
-  .ticker-item .dot{width:4px;height:4px;border-radius:50%;background:var(--champagne);}
-  @keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+/* TICKER */
+.ticker-wrap{overflow:hidden;border-top:1px solid var(–hairline);border-bottom:1px solid var(–hairline);padding:1rem 0;background:var(–espresso);}
+.ticker-track{display:flex;gap:3rem;white-space:nowrap;animation:tick 26s linear infinite;width:max-content;}
+.ticker-item{font-family:‘IBM Plex Mono’,monospace;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(–ivory-dim);display:flex;align-items:center;gap:1.4rem;}
+.ticker-item .dot{width:4px;height:4px;border-radius:50%;background:var(–champagne);}
+@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 
-  /* reveal */
-  .reveal{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
-  .reveal.visible{opacity:1;transform:translateY(0);}
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s var(–ease),transform .8s var(–ease);}
+.reveal.visible{opacity:1;transform:translateY(0);}
 
-  /* BRAND / DUALITY */
-  #duality{background:var(--espresso);}
-  .duality-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;}
-  .duality-title{font-size:clamp(2.1rem,4vw,3.4rem);margin:1.4rem 0 1.6rem;max-width:12ch;}
-  .duality-body{font-size:1.02rem;line-height:1.9;color:var(--ivory-dim);max-width:46ch;}
-  .duality-list{list-style:none;margin-top:2.2rem;display:flex;flex-direction:column;gap:1rem;}
-  .duality-list li{
-    font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--ivory-dim);
-    display:flex;justify-content:space-between;border-bottom:1px solid var(--hairline);padding-bottom:1rem;
-  }
-  .duality-list li span:last-child{color:var(--champagne);}
-  @media (max-width:860px){.duality-grid{grid-template-columns:1fr;gap:2.5rem;}}
+/* BRAND / DUALITY */
+#duality{background:var(–espresso);}
+.duality-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;}
+.duality-title{font-size:clamp(2.1rem,4vw,3.4rem);margin:1.4rem 0 1.6rem;max-width:12ch;}
+.duality-body{font-size:1.02rem;line-height:1.9;color:var(–ivory-dim);max-width:46ch;}
+.duality-list{list-style:none;margin-top:2.2rem;display:flex;flex-direction:column;gap:1rem;}
+.duality-list li{
+font-family:‘IBM Plex Mono’,monospace;font-size:.72rem;letter-spacing:.08em;color:var(–ivory-dim);
+display:flex;justify-content:space-between;border-bottom:1px solid var(–hairline);padding-bottom:1rem;
+}
+.duality-list li span:last-child{color:var(–champagne);}
+@media (max-width:860px){.duality-grid{grid-template-columns:1fr;gap:2.5rem;}}
 
-  /* SHOP */
-  #shop{background:var(--matte-black);}
-  .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3.6rem;flex-wrap:wrap;gap:1.4rem;}
-  .section-head h2{font-size:clamp(2.2rem,4.4vw,3.6rem);margin-top:1rem;}
-  .view-all{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--champagne);text-decoration:none;border-bottom:1px solid var(--champagne-dim);padding-bottom:3px;}
+/* SHOP */
+#shop{background:var(–matte-black);}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3.6rem;flex-wrap:wrap;gap:1.4rem;}
+.section-head h2{font-size:clamp(2.2rem,4.4vw,3.6rem);margin-top:1rem;}
+.view-all{font-family:‘IBM Plex Mono’,monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(–champagne);text-decoration:none;border-bottom:1px solid var(–champagne-dim);padding-bottom:3px;}
 
-  .shop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem;}
-  @media (max-width:1024px){.shop-grid{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:560px){.shop-grid{grid-template-columns:1fr;}}
-  .product-card{background:#120e0a;border:1px solid var(--hairline);cursor:pointer;transition:border-color .3s;}
-  .product-card:hover{border-color:var(--champagne-dim);}
-  .ph{
-    position:relative;aspect-ratio:4/5;overflow:hidden;
-    display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(135deg,#1c150e,#100c08);
-  }
-  .ph::after{
-    content:attr(data-label);
-    position:absolute;bottom:.9rem;left:.9rem;
-    font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;
-    color:rgba(237,230,216,.32);
-  }
-  .ph-glow{position:absolute;inset:0;opacity:.4;transition:opacity .5s;}
-  .product-card:hover .ph-glow{opacity:.65;}
-  .ph-glow.g1{background:radial-gradient(ellipse at 35% 65%,var(--walnut),transparent 70%);}
-  .ph-glow.g2{background:radial-gradient(ellipse at 65% 35%,var(--champagne-dim),transparent 70%);}
-  .ph-glow.g3{background:radial-gradient(ellipse at 50% 50%,#5a3c26,transparent 70%);}
-  .ph-glow.g4{background:radial-gradient(ellipse at 30% 30%,#7a5a34,transparent 70%);}
-  .product-info{padding:1.2rem 1.3rem 1.4rem;}
-  .product-info h4{font-family:'Fraunces',serif;font-weight:500;font-size:1.05rem;margin-bottom:.35rem;}
-  .product-meta{display:flex;justify-content:space-between;align-items:center;margin-top:.9rem;}
-  .product-price{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--champagne);}
-  .wishlist-btn{
-    background:none;border:none;color:var(--ivory-dim);font-size:1rem;cursor:pointer;transition:color .3s,transform .2s;
-  }
-  .wishlist-btn:hover{color:var(--champagne);transform:scale(1.15);}
-  .wishlist-btn.active{color:var(--champagne);}
+.shop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem;}
+@media (max-width:1024px){.shop-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:560px){.shop-grid{grid-template-columns:1fr;}}
+.product-card{background:#fbf8f2;border:1px solid var(–hairline);cursor:pointer;transition:border-color .3s,box-shadow .3s;}
+.product-card:hover{border-color:var(–champagne-dim);box-shadow:0 8px 24px rgba(91,58,36,.08);}
+.ph{
+position:relative;aspect-ratio:4/5;overflow:hidden;
+display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,#efe4d2,#e6d8c0);
+}
+.ph::after{
+content:attr(data-label);
+position:absolute;bottom:.9rem;left:.9rem;
+font-family:‘IBM Plex Mono’,monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;
+color:rgba(42,30,20,.35);
+}
+.ph-glow{position:absolute;inset:0;opacity:.28;transition:opacity .5s;}
+.product-card:hover .ph-glow{opacity:.42;}
+.ph-glow.g1{background:radial-gradient(ellipse at 35% 65%,var(–walnut),transparent 70%);}
+.ph-glow.g2{background:radial-gradient(ellipse at 65% 35%,var(–champagne-dim),transparent 70%);}
+.ph-glow.g3{background:radial-gradient(ellipse at 50% 50%,#8a5a34,transparent 70%);}
+.ph-glow.g4{background:radial-gradient(ellipse at 30% 30%,#a9793f,transparent 70%);}
+.product-info{padding:1.2rem 1.3rem 1.4rem;}
+.product-info h4{font-family:‘Fraunces’,serif;font-weight:500;font-size:1.05rem;margin-bottom:.35rem;}
+.product-meta{display:flex;justify-content:space-between;align-items:center;margin-top:.9rem;}
+.product-price{font-family:‘IBM Plex Mono’,monospace;font-size:.78rem;color:var(–champagne);}
+.wishlist-btn{
+background:none;border:none;color:var(–ivory-dim);font-size:1rem;cursor:pointer;transition:color .3s,transform .2s;
+}
+.wishlist-btn:hover{color:var(–champagne);transform:scale(1.15);}
+.wishlist-btn.active{color:var(–champagne);}
 
-  /* COLLECTIONS strip */
-  #collections{background:var(--espresso);}
-  .coll-grid{display:grid;grid-template-columns:2fr 1fr;gap:1.4rem;}
-  @media (max-width:860px){.coll-grid{grid-template-columns:1fr;}}
-  .coll-card{position:relative;overflow:hidden;min-height:420px;display:flex;align-items:flex-end;padding:2.4rem;background:linear-gradient(160deg,#1d140c,#100c08);cursor:pointer;}
-  .coll-card.small{min-height:200px;}
-  .coll-glow{position:absolute;inset:0;opacity:.35;transition:transform .8s var(--ease),opacity .5s;}
-  .coll-card:hover .coll-glow{transform:scale(1.08);opacity:.55;}
-  .coll-body{position:relative;z-index:2;}
-  .coll-tag{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--champagne);margin-bottom:.5rem;}
-  .coll-body h3{font-size:1.7rem;}
-  .coll-card.small h3{font-size:1.25rem;}
-  .coll-stack{display:flex;flex-direction:column;gap:1.4rem;}
+/* COLLECTIONS strip */
+#collections{background:var(–espresso);}
+.coll-grid{display:grid;grid-template-columns:2fr 1fr;gap:1.4rem;}
+@media (max-width:860px){.coll-grid{grid-template-columns:1fr;}}
+.coll-card{position:relative;overflow:hidden;min-height:420px;display:flex;align-items:flex-end;padding:2.4rem;background:linear-gradient(160deg,#efe4d2,#e6d8c0);cursor:pointer;}
+.coll-card.small{min-height:200px;}
+.coll-glow{position:absolute;inset:0;opacity:.3;transition:transform .8s var(–ease),opacity .5s;}
+.coll-card:hover .coll-glow{transform:scale(1.08);opacity:.45;}
+.coll-card::after{content:’’;position:absolute;inset:0;background:linear-gradient(to top, rgba(251,248,243,.92), transparent 60%);}
+.coll-body{position:relative;z-index:2;}
+.coll-tag{font-family:‘IBM Plex Mono’,monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(–champagne);margin-bottom:.5rem;}
+.coll-body h3{font-size:1.7rem;}
+.coll-card.small h3{font-size:1.25rem;}
+.coll-stack{display:flex;flex-direction:column;gap:1.4rem;}
 
-  /* ATELIER */
-  #atelier{background:#0a0806;border-top:1px solid var(--hairline);}
-  .atelier-intro{max-width:56ch;margin-bottom:3.6rem;}
-  .atelier-intro h2{font-size:clamp(2.2rem,4.4vw,3.4rem);margin:1.2rem 0 1.4rem;}
-  .atelier-intro p{color:var(--ivory-dim);font-size:1.02rem;line-height:1.85;font-family:'Fraunces',serif;font-style:italic;font-weight:400;}
-  .atelier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
-  @media (max-width:1024px){.atelier-grid{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:640px){.atelier-grid{grid-template-columns:1fr;}}
-  .atelier-card{position:relative;overflow:hidden;background:#120d09;border:1px solid var(--hairline);cursor:pointer;}
-  .atelier-thumb{position:relative;aspect-ratio:3/4;overflow:hidden;}
-  .atelier-bg{
-    position:absolute;inset:0;
-    background:linear-gradient(150deg,#211710,#0c0906);
-    background-size:cover;background-position:center;
-    filter:blur(16px);transform:scale(1.15);
-    transition:filter .5s;
-  }
-  .atelier-card:hover .atelier-bg{filter:blur(9px);}
-  .atelier-scrim{position:absolute;inset:0;background:rgba(10,8,6,.3);}
-  .lock-badge{
-    position:absolute;top:.9rem;right:.9rem;z-index:3;
-    background:rgba(12,11,9,.6);border:1px solid var(--hairline);backdrop-filter:blur(6px);
-    padding:.4rem .7rem;font-family:'IBM Plex Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--champagne);
-    display:flex;align-items:center;gap:.4rem;
-  }
-  .atelier-overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:1.5rem;background:linear-gradient(to top, rgba(10,8,6,.92), transparent 55%);}
-  .atelier-cat{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--champagne-dim);margin-bottom:.5rem;}
-  .atelier-card h3{font-size:1.2rem;margin-bottom:.5rem;}
-  .atelier-desc{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:.85rem;color:var(--ivory-dim);line-height:1.6;margin-bottom:1rem;}
-  .atelier-meta{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;color:rgba(237,230,216,.4);margin-bottom:1.1rem;}
-  .req-btn{
-    font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
-    background:none;border:1px solid var(--champagne-dim);color:var(--champagne);padding:.65rem 1rem;cursor:pointer;
-    transition:background .3s,color .3s;align-self:flex-start;
-  }
-  .req-btn:hover{background:var(--champagne);color:var(--matte-black);}
+/* ATELIER — intentionally the one dark room in the house.
+Colors here are hardcoded rather than themed off the root
+variables above, since this section keeps its own dark mood
+regardless of the light theme everywhere else. */
+#atelier{background:#171009;border-top:1px solid rgba(168,118,60,.25);color:#ede6d8;}
+.atelier-intro{max-width:56ch;margin-bottom:3.6rem;}
+.atelier-intro h2{font-size:clamp(2.2rem,4.4vw,3.4rem);margin:1.2rem 0 1.4rem;}
+.atelier-intro p{color:rgba(237,230,216,.6);font-size:1.02rem;line-height:1.85;font-family:‘Fraunces’,serif;font-style:italic;font-weight:400;}
+.atelier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+@media (max-width:1024px){.atelier-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:640px){.atelier-grid{grid-template-columns:1fr;}}
+.atelier-card{position:relative;overflow:hidden;background:#1f160d;border:1px solid rgba(168,118,60,.18);cursor:pointer;}
+.atelier-thumb{position:relative;aspect-ratio:3/4;overflow:hidden;}
+.atelier-bg{
+position:absolute;inset:0;
+background:linear-gradient(150deg,#2b1f14,#140d08);
+background-size:cover;background-position:center;
+filter:blur(16px);transform:scale(1.15);
+transition:filter .5s;
+}
+.atelier-card:hover .atelier-bg{filter:blur(9px);}
+.atelier-scrim{position:absolute;inset:0;background:rgba(15,10,6,.3);}
+.lock-badge{
+position:absolute;top:.9rem;right:.9rem;z-index:3;
+background:rgba(15,10,6,.65);border:1px solid rgba(168,118,60,.3);backdrop-filter:blur(6px);
+padding:.4rem .7rem;font-family:‘IBM Plex Mono’,monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:#d4a56a;
+display:flex;align-items:center;gap:.4rem;
+}
+.atelier-overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:1.5rem;background:linear-gradient(to top, rgba(15,10,6,.92), transparent 55%);}
+.atelier-cat{font-family:‘IBM Plex Mono’,monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:#a9784a;margin-bottom:.5rem;}
+.atelier-card h3{font-size:1.2rem;margin-bottom:.5rem;}
+.atelier-desc{font-family:‘Fraunces’,serif;font-style:italic;font-weight:400;font-size:.85rem;color:rgba(237,230,216,.6);line-height:1.6;margin-bottom:1rem;}
+.atelier-meta{font-family:‘IBM Plex Mono’,monospace;font-size:.58rem;letter-spacing:.1em;color:rgba(237,230,216,.4);margin-bottom:1.1rem;}
+.req-btn{
+font-family:‘IBM Plex Mono’,monospace;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+background:none;border:1px solid #a9784a;color:#d4a56a;padding:.65rem 1rem;cursor:pointer;
+transition:background .3s,color .3s;align-self:flex-start;
+}
+.req-btn:hover{background:#d4a56a;color:#171009;}
 
-  /* MEMBERSHIP */
-  #membership{background:var(--espresso);text-align:center;}
-  #membership .eyebrow{justify-content:center;}
-  #membership h2{font-size:clamp(2.4rem,5.4vw,4.6rem);margin:1.4rem 0 1.2rem;}
-  #membership .sub{font-family:'Fraunces',serif;font-style:italic;font-weight:400;color:var(--ivory-dim);max-width:50ch;margin:0 auto 3.6rem;line-height:1.8;font-size:1.05rem;}
-  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;max-width:1100px;margin:0 auto;text-align:left;}
-  @media (max-width:900px){.plans{grid-template-columns:1fr;max-width:420px;}}
-  .plan{background:#150f0a;border:1px solid var(--hairline);padding:2.4rem;position:relative;transition:border-color .3s;}
-  .plan:hover{border-color:var(--champagne-dim);}
-  .plan.featured{border-color:var(--champagne);}
-  .plan.featured::before{
-    content:'By Invitation';position:absolute;top:-1px;left:50%;transform:translateX(-50%);
-    background:var(--champagne);color:var(--matte-black);font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;padding:.3rem 1rem;
-  }
-  .plan-name{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:1.3rem;}
-  .plan-price{font-family:'Fraunces',serif;font-size:2.4rem;color:var(--champagne);margin-bottom:1.6rem;}
-  .plan-price span{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--ivory-dim);}
-  .plan ul{list-style:none;display:flex;flex-direction:column;gap:.85rem;margin-bottom:2rem;}
-  .plan li{font-size:.92rem;color:var(--ivory-dim);display:flex;gap:.7rem;}
-  .plan li::before{content:'—';color:var(--champagne);flex-shrink:0;}
-  .plan .btn{width:100%;justify-content:center;}
+/* MEMBERSHIP */
+#membership{background:var(–espresso);text-align:center;}
+#membership .eyebrow{justify-content:center;}
+#membership h2{font-size:clamp(2.4rem,5.4vw,4.6rem);margin:1.4rem 0 1.2rem;}
+#membership .sub{font-family:‘Fraunces’,serif;font-style:italic;font-weight:400;color:var(–ivory-dim);max-width:50ch;margin:0 auto 3.6rem;line-height:1.8;font-size:1.05rem;}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;max-width:1100px;margin:0 auto;text-align:left;}
+@media (max-width:900px){.plans{grid-template-columns:1fr;max-width:420px;}}
+.plan{background:#fbf8f2;border:1px solid var(–hairline);padding:2.4rem;position:relative;transition:border-color .3s;}
+.plan:hover{border-color:var(–champagne-dim);}
+.plan.featured{border-color:var(–champagne);}
+.plan.featured::before{
+content:‘By Invitation’;position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+background:var(–champagne);color:#fbf8f2;font-family:‘IBM Plex Mono’,monospace;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;padding:.3rem 1rem;
+}
+.plan-name{font-family:‘IBM Plex Mono’,monospace;font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(–ivory-dim);margin-bottom:1.3rem;}
+.plan-price{font-family:‘Fraunces’,serif;font-size:2.4rem;color:var(–champagne);margin-bottom:1.6rem;}
+.plan-price span{font-family:‘IBM Plex Mono’,monospace;font-size:.75rem;color:var(–ivory-dim);}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:.85rem;margin-bottom:2rem;}
+.plan li{font-size:.92rem;color:var(–ivory-dim);display:flex;gap:.7rem;}
+.plan li::before{content:’—’;color:var(–champagne);flex-shrink:0;}
+.plan .btn{width:100%;justify-content:center;}
 
-  /* FORM MODAL */
-  .modal-overlay{position:fixed;inset:0;background:rgba(8,7,5,.82);backdrop-filter:blur(6px);z-index:900;display:none;align-items:center;justify-content:center;padding:2rem;}
-  .modal-overlay.open{display:flex;}
-  .modal{background:#150f0a;border:1px solid var(--hairline);max-width:520px;width:100%;padding:2.6rem;position:relative;max-height:88vh;overflow-y:auto;}
-  .modal-close{position:absolute;top:1.2rem;right:1.3rem;background:none;border:none;color:var(--ivory-dim);font-size:1.3rem;cursor:pointer;}
-  .modal h3{font-size:1.6rem;margin-bottom:.5rem;}
-  .modal .sub{font-family:'Fraunces',serif;font-style:italic;color:var(--ivory-dim);font-size:.92rem;margin-bottom:1.8rem;line-height:1.6;}
-  .field{margin-bottom:1.1rem;}
-  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:.5rem;}
-  .field input,.field select,.field textarea{
-    width:100%;background:rgba(255,255,255,.03);border:1px solid var(--hairline);color:var(--ivory);
-    padding:.8rem .9rem;font-family:'Inter',sans-serif;font-size:.88rem;font-weight:300;
-  }
-  .field textarea{resize:vertical;min-height:70px;}
-  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--champagne-dim);}
-  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-  @media (max-width:480px){.field-row{grid-template-columns:1fr;}}
-  .agree{display:flex;align-items:flex-start;gap:.7rem;margin:1.4rem 0 1.6rem;}
-  .agree input{width:16px;height:16px;margin-top:2px;accent-color:var(--champagne);}
-  .agree label{font-size:.78rem;color:var(--ivory-dim);line-height:1.5;}
-  .modal .btn{width:100%;justify-content:center;}
-  .success{display:none;text-align:center;padding:2rem 0;}
-  .success.show{display:block;}
-  .success svg{width:52px;height:52px;margin:0 auto 1.4rem;display:block;}
-  .success h4{font-size:1.4rem;margin-bottom:.6rem;}
-  .success p{color:var(--ivory-dim);font-size:.9rem;font-family:'Fraunces',serif;font-style:italic;}
-  .success-circle{stroke-dasharray:166;stroke-dashoffset:166;animation:draw 0.6s var(--ease) forwards;}
-  .success-check{stroke-dasharray:48;stroke-dashoffset:48;animation:draw 0.4s var(--ease) .5s forwards;}
-  @keyframes draw{to{stroke-dashoffset:0;}}
+/* FORM MODAL — stays dark, tied to the Atelier request flow it opens from.
+Colors here are hardcoded, decoupled from the light-theme root vars. */
+.modal-overlay{position:fixed;inset:0;background:rgba(8,7,5,.82);backdrop-filter:blur(6px);z-index:900;display:none;align-items:center;justify-content:center;padding:2rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:#171009;border:1px solid rgba(168,118,60,.22);max-width:520px;width:100%;padding:2.6rem;position:relative;max-height:88vh;overflow-y:auto;color:#ede6d8;}
+.modal-close{position:absolute;top:1.2rem;right:1.3rem;background:none;border:none;color:rgba(237,230,216,.55);font-size:1.3rem;cursor:pointer;}
+.modal h3{font-size:1.6rem;margin-bottom:.5rem;}
+.modal .sub{font-family:‘Fraunces’,serif;font-style:italic;color:rgba(237,230,216,.55);font-size:.92rem;margin-bottom:1.8rem;line-height:1.6;}
+.field{margin-bottom:1.1rem;}
+.field label{display:block;font-family:‘IBM Plex Mono’,monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(237,230,216,.55);margin-bottom:.5rem;}
+.field input,.field select,.field textarea{
+width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(168,118,60,.25);color:#ede6d8;
+padding:.8rem .9rem;font-family:‘Inter’,sans-serif;font-size:.88rem;font-weight:300;
+}
+.field textarea{resize:vertical;min-height:70px;}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#d4a56a;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media (max-width:480px){.field-row{grid-template-columns:1fr;}}
+.agree{display:flex;align-items:flex-start;gap:.7rem;margin:1.4rem 0 1.6rem;}
+.agree input{width:16px;height:16px;margin-top:2px;accent-color:#d4a56a;}
+.agree label{font-size:.78rem;color:rgba(237,230,216,.55);line-height:1.5;}
+.modal .btn{width:100%;justify-content:center;}
+.success{display:none;text-align:center;padding:2rem 0;}
+.success.show{display:block;}
+.success svg{width:52px;height:52px;margin:0 auto 1.4rem;display:block;}
+.success h4{font-size:1.4rem;margin-bottom:.6rem;}
+.success p{color:rgba(237,230,216,.55);font-size:.9rem;font-family:‘Fraunces’,serif;font-style:italic;}
+.success-circle{stroke-dasharray:166;stroke-dashoffset:166;animation:draw 0.6s var(–ease) forwards;}
+.success-check{stroke-dasharray:48;stroke-dashoffset:48;animation:draw 0.4s var(–ease) .5s forwards;}
+@keyframes draw{to{stroke-dashoffset:0;}}
 
-  /* FOOTER */
-  footer{background:#070605;padding:4rem 6vw 2.4rem;border-top:1px solid rgba(255,255,255,.04);}
-  .foot-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:3rem;padding-bottom:3rem;}
-  @media (max-width:800px){.foot-top{grid-template-columns:1fr 1fr;}}
-  .foot-brand p{color:var(--ivory-dim);font-size:.88rem;line-height:1.7;margin-top:1rem;max-width:32ch;}
-  .foot-col h5{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--champagne-dim);margin-bottom:1.2rem;}
-  .foot-col a{display:block;font-size:.85rem;color:var(--ivory-dim);text-decoration:none;margin-bottom:.8rem;transition:color .3s;}
-  .foot-col a:hover{color:var(--champagne);}
-  .foot-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.08em;color:#3a352c;}
+/* FOOTER — the dark-brown bookend at the bottom of the page */
+footer{background:#1c130c;padding:4rem 6vw 2.4rem;border-top:1px solid rgba(168,118,60,.15);color:#ede6d8;}
+.foot-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:3rem;padding-bottom:3rem;}
+@media (max-width:800px){.foot-top{grid-template-columns:1fr 1fr;}}
+.foot-brand p{color:rgba(237,230,216,.55);font-size:.88rem;line-height:1.7;margin-top:1rem;max-width:32ch;}
+.foot-col h5{font-family:‘IBM Plex Mono’,monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:#a9784a;margin-bottom:1.2rem;}
+.foot-col a{display:block;font-size:.85rem;color:rgba(237,230,216,.55);text-decoration:none;margin-bottom:.8rem;transition:color .3s;}
+.foot-col a:hover{color:#d4a56a;}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-family:‘IBM Plex Mono’,monospace;font-size:.62rem;letter-spacing:.08em;color:#5a4d3c;}
 </style>
+
 </head>
 <body>
 
 <div id="announcementBar" style="display:none;background:var(--champagne);color:#0b0a08;text-align:center;padding:.6rem 1rem;font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.08em;position:relative;z-index:301;"></div>
 <nav>
   <a href="#hero" class="logo">
-    <svg viewBox="0 0 40 40" fill="none"><path d="M8 26 C8 20 12 18 20 18 C28 18 32 20 32 26 L32 30 L8 30 Z" stroke="#c6a15b" stroke-width="1.4"/><path d="M8 26 L8 22 C8 20 9.5 19 11 19" stroke="#c6a15b" stroke-width="1.4"/><path d="M32 26 L32 22 C32 20 30.5 19 29 19" stroke="#c6a15b" stroke-width="1.4"/><line x1="8" y1="30" x2="8" y2="33" stroke="#c6a15b" stroke-width="1.4"/><line x1="32" y1="30" x2="32" y2="33" stroke="#c6a15b" stroke-width="1.4"/></svg>
-    <span class="logo-word">CASSAVA</span>
+    <svg viewBox="0 0 40 40" fill="none"><path d="M8 26 C8 20 12 18 20 18 C28 18 32 20 32 26 L32 30 L8 30 Z" stroke="#a8763c" stroke-width="1.4"/><path d="M8 26 L8 22 C8 20 9.5 19 11 19" stroke="#a8763c" stroke-width="1.4"/><path d="M32 26 L32 22 C32 20 30.5 19 29 19" stroke="#a8763c" stroke-width="1.4"/><line x1="8" y1="30" x2="8" y2="33" stroke="#a8763c" stroke-width="1.4"/><line x1="32" y1="30" x2="32" y2="33" stroke="#a8763c" stroke-width="1.4"/></svg>
+    <span class="logo-word">CASSAVA COUCH</span>
   </a>
   <ul class="nav-links">
     <li><a href="#shop">Shop</a></li>
@@ -375,7 +377,7 @@
     <div class="reveal">
       <div class="eyebrow" id="dualityEyebrow">Two Rooms, One House</div>
       <h2 class="duality-title" id="dualityTitle">A showroom.<br>And a door<br>past it.</h2>
-      <p class="duality-body" id="dualityBody">Cassava makes seating first — cut, upholstered, and finished by hand. What we've built alongside it is smaller and quieter: a members' room of editorial film and photography, shot around the furniture, shown to very few people. Nothing here is loud about either.</p>
+      <p class="duality-body" id="dualityBody">Cassava Couch makes seating first — cut, upholstered, and finished by hand. What we've built alongside it is smaller and quieter: a members' room of editorial film and photography, shot around the furniture, shown to very few people. Nothing here is loud about either.</p>
     </div>
     <div class="reveal">
       <ul class="duality-list">
@@ -470,7 +472,7 @@
 <footer>
   <div class="foot-top">
     <div class="foot-brand">
-      <div class="logo-word" style="color:var(--champagne)">CASSAVA</div>
+      <div class="logo-word" style="color:var(--champagne)">CASSAVA COUCH</div>
       <p id="footerTagline">Luxury seating and a private atelier, for those who live well anywhere.</p>
     </div>
     <div class="foot-col">
@@ -487,12 +489,13 @@
     </div>
   </div>
   <div class="foot-bottom">
-    <span>© 2026 CASSAVA. ALL RIGHTS RESERVED.</span>
+    <span>© 2026 CASSAVA COUCH. ALL RIGHTS RESERVED.</span>
     <span>ATELIER ADMISSION IS DISCRETIONARY AND RESERVED FOR ADULTS 18+.</span>
   </div>
 </footer>
 
 <!-- REQUEST ACCESS MODAL -->
+
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <button class="modal-close" id="modalClose">&times;</button>
@@ -522,7 +525,7 @@
       </form>
     </div>
     <div class="success" id="successView">
-      <svg viewBox="0 0 60 60"><circle class="success-circle" cx="30" cy="30" r="26" fill="none" stroke="#c6a15b" stroke-width="2"/><path class="success-check" d="M18 31 L26 39 L42 21" fill="none" stroke="#c6a15b" stroke-width="2.4"/></svg>
+      <svg viewBox="0 0 60 60"><circle class="success-circle" cx="30" cy="30" r="26" fill="none" stroke="#d4a56a" stroke-width="2"/><path class="success-check" d="M18 31 L26 39 L42 21" fill="none" stroke="#d4a56a" stroke-width="2.4"/></svg>
       <h4>Request Received</h4>
       <p>We'll be in touch if your request is approved.</p>
     </div>
@@ -534,9 +537,10 @@
   import {
     collection, doc, query, where, orderBy, onSnapshot, addDoc, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-  window.__cassavaDb = db;
-  window.__cassavaFirestore = { collection, doc, query, where, orderBy, onSnapshot, addDoc, serverTimestamp };
+  window.__cctvDb = db;
+  window.__cctvFirestore = { collection, doc, query, where, orderBy, onSnapshot, addDoc, serverTimestamp };
 </script>
+
 <script>
   // ---- Mode toggle: Shop <-> Atelier (signature interaction) ----
   const modeToggle = document.getElementById('modeToggle');
@@ -598,9 +602,9 @@
   ];
 
   (function initShop(){
-    if (!window.__cassavaDb) { placeholderProducts.forEach((p,i)=>shopGrid.appendChild(renderProductCard(p,i))); return; }
-    const { collection, query, where, onSnapshot } = window.__cassavaFirestore;
-    const q = query(collection(window.__cassavaDb, 'products'), where('visibility','==','published'));
+    if (!window.__cctvDb) { placeholderProducts.forEach((p,i)=>shopGrid.appendChild(renderProductCard(p,i))); return; }
+    const { collection, query, where, onSnapshot } = window.__cctvFirestore;
+    const q = query(collection(window.__cctvDb, 'products'), where('visibility','==','published'));
     onSnapshot(q, snap => {
       shopGrid.innerHTML = '';
       if (snap.empty) { placeholderProducts.forEach((p,i)=>shopGrid.appendChild(renderProductCard(p,i))); return; }
@@ -622,7 +626,7 @@
     'radial-gradient(ellipse at 50% 50%, #5a3c26, transparent 70%)',
   ];
   const placeholderCollections = [
-    {tag:'Flagship', title:'The Cassava Signature Collection'},
+    {tag:'Flagship', title:'The Cassava Couch Signature Collection'},
     {tag:'Guest Designers', title:'International Collaborations'},
     {tag:'Limited', title:'Limited Editions & Bespoke'},
   ];
@@ -653,9 +657,9 @@
   }
 
   (function initCollections(){
-    if (!window.__cassavaDb) { renderCollections([]); return; }
-    const { collection, query, orderBy, onSnapshot } = window.__cassavaFirestore;
-    const q = query(collection(window.__cassavaDb, 'collections'), orderBy('sortOrder','asc'));
+    if (!window.__cctvDb) { renderCollections([]); return; }
+    const { collection, query, orderBy, onSnapshot } = window.__cctvFirestore;
+    const q = query(collection(window.__cctvDb, 'collections'), orderBy('sortOrder','asc'));
     onSnapshot(q, snap => {
       const list = snap.docs.map(d=>d.data()).filter(c => c.visibility !== 'hidden');
       renderCollections(list);
@@ -699,9 +703,9 @@
   ];
 
   (function initAtelier(){
-    if (!window.__cassavaDb) { placeholderAtelier.forEach(a=>atelierGrid.appendChild(renderAtelierCard(a))); return; }
-    const { collection, query, where, onSnapshot } = window.__cassavaFirestore;
-    const q = query(collection(window.__cassavaDb, 'videos'), where('visibility','==','public'));
+    if (!window.__cctvDb) { placeholderAtelier.forEach(a=>atelierGrid.appendChild(renderAtelierCard(a))); return; }
+    const { collection, query, where, onSnapshot } = window.__cctvFirestore;
+    const q = query(collection(window.__cctvDb, 'videos'), where('visibility','==','public'));
     onSnapshot(q, snap => {
       atelierGrid.innerHTML = '';
       if (snap.empty) { placeholderAtelier.forEach(a=>atelierGrid.appendChild(renderAtelierCard(a))); return; }
@@ -764,9 +768,9 @@
     };
 
     try {
-      if (window.__cassavaDb) {
-        const { collection, addDoc, serverTimestamp } = window.__cassavaFirestore;
-        await addDoc(collection(window.__cassavaDb, 'access_requests'), { ...payload, timestamp: serverTimestamp() });
+      if (window.__cctvDb) {
+        const { collection, addDoc, serverTimestamp } = window.__cctvFirestore;
+        await addDoc(collection(window.__cctvDb, 'access_requests'), { ...payload, timestamp: serverTimestamp() });
       } else {
         console.warn('Firestore not initialized — request not persisted:', payload);
       }
@@ -791,9 +795,9 @@
   // in Settings → Homepage in admin. If no settings doc exists yet, every
   // hardcoded default above stays exactly as-is — nothing breaks. ----
   (function initHomepageCMS(){
-    if (!window.__cassavaDb) return;
-    const { doc, onSnapshot } = window.__cassavaFirestore;
-    onSnapshot(doc(window.__cassavaDb, 'settings', 'homepage'), snap => {
+    if (!window.__cctvDb) return;
+    const { doc, onSnapshot } = window.__cctvFirestore;
+    onSnapshot(doc(window.__cctvDb, 'settings', 'homepage'), snap => {
       if (!snap.exists()) return;
       const s = snap.data();
 
