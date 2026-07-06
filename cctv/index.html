@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cassava — Furniture for the private hours</title>
+<meta name="description" content="Cassava. Luxury seating, and a private atelier for those invited further.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --matte-black:#0c0b09;
+    --espresso:#241810;
+    --walnut:#4a3020;
+    --champagne:#c6a15b;
+    --champagne-dim:#8f7748;
+    --ivory:#ede6d8;
+    --ivory-dim:rgba(237,230,216,.58);
+    --olive:#332d22;
+    --hairline:rgba(198,161,91,.18);
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--matte-black);
+    color:var(--ivory);
+    font-family:'Inter',sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--champagne);color:var(--matte-black);}
+  a{color:inherit;}
+  img,svg{display:block;max-width:100%;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:.68rem;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    color:var(--champagne-dim);
+    display:flex;align-items:center;gap:.9rem;
+  }
+  .eyebrow::before{content:'';width:26px;height:1px;background:var(--champagne-dim);flex-shrink:0;}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:500;line-height:1.05;letter-spacing:-.01em;}
+  em{font-style:italic;font-weight:400;color:var(--champagne);}
+  .wrap{max-width:1320px;margin:0 auto;padding-left:6vw;padding-right:6vw;}
+  section{padding:8.5rem 0;}
+  .btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:.72rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    padding:1rem 2.1rem;
+    border:1px solid var(--champagne);
+    color:var(--champagne);
+    background:transparent;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:.6rem;
+    cursor:pointer;
+    transition:background .35s var(--ease),color .35s var(--ease);
+  }
+  .btn:hover{background:var(--champagne);color:var(--matte-black);}
+  .btn.solid{background:var(--champagne);color:var(--matte-black);}
+  .btn.solid:hover{background:var(--ivory);border-color:var(--ivory);}
+  .btn.ghost{border-color:rgba(237,230,216,.28);color:var(--ivory-dim);}
+  .btn.ghost:hover{border-color:var(--ivory);color:var(--ivory);background:transparent;}
+
+  /* grain */
+  body::before{
+    content:'';position:fixed;inset:0;z-index:400;pointer-events:none;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* NAV */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:300;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.6rem 6vw;
+  }
+  nav::after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom, rgba(12,11,9,.85), transparent);}
+  .logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;}
+  .logo svg{width:30px;height:30px;}
+  .logo-word{font-family:'Fraunces',serif;font-size:1.05rem;letter-spacing:.02em;color:var(--ivory);}
+  .nav-links{display:flex;gap:2.4rem;list-style:none;}
+  .nav-links a{
+    font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+    text-decoration:none;color:var(--ivory-dim);transition:color .3s;
+  }
+  .nav-links a:hover{color:var(--champagne);}
+  .nav-right{display:flex;align-items:center;gap:1.6rem;}
+  @media (max-width:860px){.nav-links{display:none;}}
+
+  /* MODE TOGGLE — the signature element */
+  .mode-toggle{
+    display:flex;align-items:center;gap:.65rem;
+    font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
+  }
+  .mode-toggle .lbl{color:var(--ivory-dim);transition:color .3s;}
+  .mode-toggle .lbl.active{color:var(--champagne);}
+  .toggle-track{
+    position:relative;width:52px;height:22px;border:1px solid var(--hairline);border-radius:11px;
+    cursor:pointer;background:rgba(255,255,255,.02);
+  }
+  .toggle-thumb{
+    position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
+    background:var(--champagne);transition:transform .45s var(--ease);
+  }
+  body.atelier .toggle-thumb{transform:translateX(28px);background:#cf8a4a;}
+
+  /* HERO */
+  #hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;position:relative;padding-bottom:7vh;overflow:hidden;}
+  .hero-bg{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 55% 70% at 76% 22%, rgba(198,161,91,.10), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 15% 85%, rgba(74,48,32,.5), transparent 55%),
+      linear-gradient(165deg, #100c09 0%, #0c0b09 55%, #150f0a 100%);
+    transition:background 1s var(--ease);
+  }
+  body.atelier .hero-bg{
+    background:
+      radial-gradient(ellipse 55% 70% at 76% 22%, rgba(207,138,74,.14), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 15% 85%, rgba(51,45,34,.6), transparent 55%),
+      linear-gradient(165deg, #0e0b08 0%, #0a0908 55%, #120d08 100%);
+  }
+  .hero-grain-line{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.035) 2px,rgba(0,0,0,.035) 4px);pointer-events:none;}
+  .hero-inner{position:relative;z-index:2;}
+  .wrap.hero-inner{padding-top:14vh;}
+  .hero-title{font-size:clamp(3rem,8.4vw,7.2rem);margin:1.6rem 0 2.2rem;max-width:14ch;}
+  .hero-row{display:flex;justify-content:space-between;align-items:flex-end;gap:2.5rem;flex-wrap:wrap;}
+  .hero-desc{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:1.15rem;color:var(--ivory-dim);max-width:34ch;line-height:1.7;}
+  .hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;}
+
+  /* couch signature svg */
+  .couch-mark{position:absolute;right:5vw;bottom:6vh;width:min(38vw,460px);opacity:.9;z-index:1;pointer-events:none;}
+  .couch-mark path,.couch-mark line{stroke:var(--champagne-dim);}
+  @media (max-width:860px){.couch-mark{display:none;}}
+
+  /* TICKER */
+  .ticker-wrap{overflow:hidden;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);padding:1rem 0;background:var(--espresso);}
+  .ticker-track{display:flex;gap:3rem;white-space:nowrap;animation:tick 26s linear infinite;width:max-content;}
+  .ticker-item{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ivory-dim);display:flex;align-items:center;gap:1.4rem;}
+  .ticker-item .dot{width:4px;height:4px;border-radius:50%;background:var(--champagne);}
+  @keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  /* BRAND / DUALITY */
+  #duality{background:var(--espresso);}
+  .duality-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;}
+  .duality-title{font-size:clamp(2.1rem,4vw,3.4rem);margin:1.4rem 0 1.6rem;max-width:12ch;}
+  .duality-body{font-size:1.02rem;line-height:1.9;color:var(--ivory-dim);max-width:46ch;}
+  .duality-list{list-style:none;margin-top:2.2rem;display:flex;flex-direction:column;gap:1rem;}
+  .duality-list li{
+    font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--ivory-dim);
+    display:flex;justify-content:space-between;border-bottom:1px solid var(--hairline);padding-bottom:1rem;
+  }
+  .duality-list li span:last-child{color:var(--champagne);}
+  @media (max-width:860px){.duality-grid{grid-template-columns:1fr;gap:2.5rem;}}
+
+  /* SHOP */
+  #shop{background:var(--matte-black);}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3.6rem;flex-wrap:wrap;gap:1.4rem;}
+  .section-head h2{font-size:clamp(2.2rem,4.4vw,3.6rem);margin-top:1rem;}
+  .view-all{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--champagne);text-decoration:none;border-bottom:1px solid var(--champagne-dim);padding-bottom:3px;}
+
+  .shop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem;}
+  @media (max-width:1024px){.shop-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.shop-grid{grid-template-columns:1fr;}}
+  .product-card{background:#120e0a;border:1px solid var(--hairline);cursor:pointer;transition:border-color .3s;}
+  .product-card:hover{border-color:var(--champagne-dim);}
+  .ph{
+    position:relative;aspect-ratio:4/5;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#1c150e,#100c08);
+  }
+  .ph::after{
+    content:attr(data-label);
+    position:absolute;bottom:.9rem;left:.9rem;
+    font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(237,230,216,.32);
+  }
+  .ph-glow{position:absolute;inset:0;opacity:.4;transition:opacity .5s;}
+  .product-card:hover .ph-glow{opacity:.65;}
+  .ph-glow.g1{background:radial-gradient(ellipse at 35% 65%,var(--walnut),transparent 70%);}
+  .ph-glow.g2{background:radial-gradient(ellipse at 65% 35%,var(--champagne-dim),transparent 70%);}
+  .ph-glow.g3{background:radial-gradient(ellipse at 50% 50%,#5a3c26,transparent 70%);}
+  .ph-glow.g4{background:radial-gradient(ellipse at 30% 30%,#7a5a34,transparent 70%);}
+  .product-info{padding:1.2rem 1.3rem 1.4rem;}
+  .product-info h4{font-family:'Fraunces',serif;font-weight:500;font-size:1.05rem;margin-bottom:.35rem;}
+  .product-meta{display:flex;justify-content:space-between;align-items:center;margin-top:.9rem;}
+  .product-price{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--champagne);}
+  .wishlist-btn{
+    background:none;border:none;color:var(--ivory-dim);font-size:1rem;cursor:pointer;transition:color .3s,transform .2s;
+  }
+  .wishlist-btn:hover{color:var(--champagne);transform:scale(1.15);}
+  .wishlist-btn.active{color:var(--champagne);}
+
+  /* COLLECTIONS strip */
+  #collections{background:var(--espresso);}
+  .coll-grid{display:grid;grid-template-columns:2fr 1fr;gap:1.4rem;}
+  @media (max-width:860px){.coll-grid{grid-template-columns:1fr;}}
+  .coll-card{position:relative;overflow:hidden;min-height:420px;display:flex;align-items:flex-end;padding:2.4rem;background:linear-gradient(160deg,#1d140c,#100c08);cursor:pointer;}
+  .coll-card.small{min-height:200px;}
+  .coll-glow{position:absolute;inset:0;opacity:.35;transition:transform .8s var(--ease),opacity .5s;}
+  .coll-card:hover .coll-glow{transform:scale(1.08);opacity:.55;}
+  .coll-body{position:relative;z-index:2;}
+  .coll-tag{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--champagne);margin-bottom:.5rem;}
+  .coll-body h3{font-size:1.7rem;}
+  .coll-card.small h3{font-size:1.25rem;}
+  .coll-stack{display:flex;flex-direction:column;gap:1.4rem;}
+
+  /* ATELIER */
+  #atelier{background:#0a0806;border-top:1px solid var(--hairline);}
+  .atelier-intro{max-width:56ch;margin-bottom:3.6rem;}
+  .atelier-intro h2{font-size:clamp(2.2rem,4.4vw,3.4rem);margin:1.2rem 0 1.4rem;}
+  .atelier-intro p{color:var(--ivory-dim);font-size:1.02rem;line-height:1.85;font-family:'Fraunces',serif;font-style:italic;font-weight:400;}
+  .atelier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+  @media (max-width:1024px){.atelier-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:640px){.atelier-grid{grid-template-columns:1fr;}}
+  .atelier-card{position:relative;overflow:hidden;background:#120d09;border:1px solid var(--hairline);cursor:pointer;}
+  .atelier-thumb{position:relative;aspect-ratio:3/4;overflow:hidden;}
+  .atelier-bg{
+    position:absolute;inset:0;
+    background:linear-gradient(150deg,#211710,#0c0906);
+    background-size:cover;background-position:center;
+    filter:blur(16px);transform:scale(1.15);
+    transition:filter .5s;
+  }
+  .atelier-card:hover .atelier-bg{filter:blur(9px);}
+  .atelier-scrim{position:absolute;inset:0;background:rgba(10,8,6,.3);}
+  .lock-badge{
+    position:absolute;top:.9rem;right:.9rem;z-index:3;
+    background:rgba(12,11,9,.6);border:1px solid var(--hairline);backdrop-filter:blur(6px);
+    padding:.4rem .7rem;font-family:'IBM Plex Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--champagne);
+    display:flex;align-items:center;gap:.4rem;
+  }
+  .atelier-overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:1.5rem;background:linear-gradient(to top, rgba(10,8,6,.92), transparent 55%);}
+  .atelier-cat{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--champagne-dim);margin-bottom:.5rem;}
+  .atelier-card h3{font-size:1.2rem;margin-bottom:.5rem;}
+  .atelier-desc{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:.85rem;color:var(--ivory-dim);line-height:1.6;margin-bottom:1rem;}
+  .atelier-meta{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.1em;color:rgba(237,230,216,.4);margin-bottom:1.1rem;}
+  .req-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+    background:none;border:1px solid var(--champagne-dim);color:var(--champagne);padding:.65rem 1rem;cursor:pointer;
+    transition:background .3s,color .3s;align-self:flex-start;
+  }
+  .req-btn:hover{background:var(--champagne);color:var(--matte-black);}
+
+  /* MEMBERSHIP */
+  #membership{background:var(--espresso);text-align:center;}
+  #membership .eyebrow{justify-content:center;}
+  #membership h2{font-size:clamp(2.4rem,5.4vw,4.6rem);margin:1.4rem 0 1.2rem;}
+  #membership .sub{font-family:'Fraunces',serif;font-style:italic;font-weight:400;color:var(--ivory-dim);max-width:50ch;margin:0 auto 3.6rem;line-height:1.8;font-size:1.05rem;}
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;max-width:1100px;margin:0 auto;text-align:left;}
+  @media (max-width:900px){.plans{grid-template-columns:1fr;max-width:420px;}}
+  .plan{background:#150f0a;border:1px solid var(--hairline);padding:2.4rem;position:relative;transition:border-color .3s;}
+  .plan:hover{border-color:var(--champagne-dim);}
+  .plan.featured{border-color:var(--champagne);}
+  .plan.featured::before{
+    content:'By Invitation';position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+    background:var(--champagne);color:var(--matte-black);font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;padding:.3rem 1rem;
+  }
+  .plan-name{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:1.3rem;}
+  .plan-price{font-family:'Fraunces',serif;font-size:2.4rem;color:var(--champagne);margin-bottom:1.6rem;}
+  .plan-price span{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--ivory-dim);}
+  .plan ul{list-style:none;display:flex;flex-direction:column;gap:.85rem;margin-bottom:2rem;}
+  .plan li{font-size:.92rem;color:var(--ivory-dim);display:flex;gap:.7rem;}
+  .plan li::before{content:'—';color:var(--champagne);flex-shrink:0;}
+  .plan .btn{width:100%;justify-content:center;}
+
+  /* FORM MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(8,7,5,.82);backdrop-filter:blur(6px);z-index:900;display:none;align-items:center;justify-content:center;padding:2rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#150f0a;border:1px solid var(--hairline);max-width:520px;width:100%;padding:2.6rem;position:relative;max-height:88vh;overflow-y:auto;}
+  .modal-close{position:absolute;top:1.2rem;right:1.3rem;background:none;border:none;color:var(--ivory-dim);font-size:1.3rem;cursor:pointer;}
+  .modal h3{font-size:1.6rem;margin-bottom:.5rem;}
+  .modal .sub{font-family:'Fraunces',serif;font-style:italic;color:var(--ivory-dim);font-size:.92rem;margin-bottom:1.8rem;line-height:1.6;}
+  .field{margin-bottom:1.1rem;}
+  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:.5rem;}
+  .field input,.field select,.field textarea{
+    width:100%;background:rgba(255,255,255,.03);border:1px solid var(--hairline);color:var(--ivory);
+    padding:.8rem .9rem;font-family:'Inter',sans-serif;font-size:.88rem;font-weight:300;
+  }
+  .field textarea{resize:vertical;min-height:70px;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--champagne-dim);}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  @media (max-width:480px){.field-row{grid-template-columns:1fr;}}
+  .agree{display:flex;align-items:flex-start;gap:.7rem;margin:1.4rem 0 1.6rem;}
+  .agree input{width:16px;height:16px;margin-top:2px;accent-color:var(--champagne);}
+  .agree label{font-size:.78rem;color:var(--ivory-dim);line-height:1.5;}
+  .modal .btn{width:100%;justify-content:center;}
+  .success{display:none;text-align:center;padding:2rem 0;}
+  .success.show{display:block;}
+  .success svg{width:52px;height:52px;margin:0 auto 1.4rem;display:block;}
+  .success h4{font-size:1.4rem;margin-bottom:.6rem;}
+  .success p{color:var(--ivory-dim);font-size:.9rem;font-family:'Fraunces',serif;font-style:italic;}
+  .success-circle{stroke-dasharray:166;stroke-dashoffset:166;animation:draw 0.6s var(--ease) forwards;}
+  .success-check{stroke-dasharray:48;stroke-dashoffset:48;animation:draw 0.4s var(--ease) .5s forwards;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+
+  /* FOOTER */
+  footer{background:#070605;padding:4rem 6vw 2.4rem;border-top:1px solid rgba(255,255,255,.04);}
+  .foot-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:3rem;padding-bottom:3rem;}
+  @media (max-width:800px){.foot-top{grid-template-columns:1fr 1fr;}}
+  .foot-brand p{color:var(--ivory-dim);font-size:.88rem;line-height:1.7;margin-top:1rem;max-width:32ch;}
+  .foot-col h5{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--champagne-dim);margin-bottom:1.2rem;}
+  .foot-col a{display:block;font-size:.85rem;color:var(--ivory-dim);text-decoration:none;margin-bottom:.8rem;transition:color .3s;}
+  .foot-col a:hover{color:var(--champagne);}
+  .foot-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.08em;color:#3a352c;}
+</style>
+</head>
+<body>
+
+<div id="announcementBar" style="display:none;background:var(--champagne);color:#0b0a08;text-align:center;padding:.6rem 1rem;font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.08em;position:relative;z-index:301;"></div>
+<nav>
+  <a href="#hero" class="logo">
+    <svg viewBox="0 0 40 40" fill="none"><path d="M8 26 C8 20 12 18 20 18 C28 18 32 20 32 26 L32 30 L8 30 Z" stroke="#c6a15b" stroke-width="1.4"/><path d="M8 26 L8 22 C8 20 9.5 19 11 19" stroke="#c6a15b" stroke-width="1.4"/><path d="M32 26 L32 22 C32 20 30.5 19 29 19" stroke="#c6a15b" stroke-width="1.4"/><line x1="8" y1="30" x2="8" y2="33" stroke="#c6a15b" stroke-width="1.4"/><line x1="32" y1="30" x2="32" y2="33" stroke="#c6a15b" stroke-width="1.4"/></svg>
+    <span class="logo-word">CASSAVA</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#collections">Collections</a></li>
+    <li><a href="#atelier">The Atelier</a></li>
+    <li><a href="#membership">Membership</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="mode-toggle" id="modeToggle">
+      <span class="lbl active" id="lblShop">Shop</span>
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      <span class="lbl" id="lblAtelier">Atelier</span>
+    </div>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grain-line"></div>
+  <svg class="couch-mark" viewBox="0 0 400 240" fill="none">
+    <path d="M40 150 C40 110 70 95 200 95 C330 95 360 110 360 150 L360 190 L40 190 Z" stroke-width="1.2"/>
+    <path d="M40 150 L40 120 C40 105 55 95 75 95" stroke-width="1.2"/>
+    <path d="M360 150 L360 120 C360 105 345 95 325 95" stroke-width="1.2"/>
+    <line x1="40" y1="190" x2="40" y2="215" stroke-width="1.2"/>
+    <line x1="130" y1="190" x2="130" y2="215" stroke-width="1.2"/>
+    <line x1="270" y1="190" x2="270" y2="215" stroke-width="1.2"/>
+    <line x1="360" y1="190" x2="360" y2="215" stroke-width="1.2"/>
+    <line x1="150" y1="100" x2="150" y2="150" stroke-width=".6" stroke-dasharray="2 4"/>
+    <line x1="250" y1="100" x2="250" y2="150" stroke-width=".6" stroke-dasharray="2 4"/>
+  </svg>
+  <div class="wrap hero-inner">
+    <div class="eyebrow" id="heroEyebrow">Cassava &nbsp;·&nbsp; Est. 2023</div>
+    <h1 class="hero-title" id="heroTitle">Where comfort<br>meets <em>curiosity.</em></h1>
+    <div class="hero-row">
+      <p class="hero-desc" id="heroDesc">Furniture built for how you actually live — and, for those invited further, a private atelier of editorial work we don't put in the window.</p>
+      <div class="hero-ctas">
+        <a href="#shop" class="btn solid" id="heroCtaPrimary">Explore Collection</a>
+        <a href="#atelier" class="btn" id="heroCtaSecondary">The Atelier →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker-wrap">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<section id="duality">
+  <div class="wrap duality-grid">
+    <div class="reveal">
+      <div class="eyebrow" id="dualityEyebrow">Two Rooms, One House</div>
+      <h2 class="duality-title" id="dualityTitle">A showroom.<br>And a door<br>past it.</h2>
+      <p class="duality-body" id="dualityBody">Cassava makes seating first — cut, upholstered, and finished by hand. What we've built alongside it is smaller and quieter: a members' room of editorial film and photography, shot around the furniture, shown to very few people. Nothing here is loud about either.</p>
+    </div>
+    <div class="reveal">
+      <ul class="duality-list">
+        <li><span>Sofas &amp; sectionals in the current collection</span><span>32</span></li>
+        <li><span>Fabric and leather options</span><span>60+</span></li>
+        <li><span>Atelier admissions reviewed monthly</span><span>By request</span></li>
+        <li><span>Cities we deliver to</span><span>Shipping worldwide</span></li>
+        <li><span>Founded</span><span>2023</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="shop">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Shop</div>
+        <h2>Signature<br><em>Seating</em></h2>
+      </div>
+      <a href="#" class="view-all">View Full Catalogue →</a>
+    </div>
+    <div class="shop-grid reveal" id="shopGrid"></div>
+  </div>
+</section>
+
+<section id="collections">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Collections</div>
+        <h2>Curated by<br><em>room and mood</em></h2>
+      </div>
+    </div>
+    <div class="coll-grid reveal" id="collGrid"></div>
+  </div>
+</section>
+
+<section id="atelier">
+  <div class="wrap">
+    <div class="atelier-intro reveal">
+      <div class="eyebrow">By Invitation</div>
+      <h2>The Atelier</h2>
+      <p>A small, private collection of editorial film and photography, shot around the furniture and the people who live with it. Access is by request and reviewed individually — not everyone who applies is admitted.</p>
+    </div>
+    <div class="atelier-grid reveal" id="atelierGrid"></div>
+  </div>
+</section>
+
+<section id="membership">
+  <div class="wrap">
+    <div class="eyebrow" id="membershipEyebrow">Membership</div>
+    <h2 id="membershipTitle">Ways to<br><em>belong</em></h2>
+    <p class="sub" id="membershipSub">Trade and design-consultation perks sit alongside atelier access — choose the tier that matches how deep into the house you'd like to come.</p>
+    <div class="plans" id="plansGrid">
+      <div class="plan">
+        <div class="plan-name">Associate</div>
+        <div class="plan-price">Free</div>
+        <ul>
+          <li>Early access to new arrivals</li>
+          <li>Journal &amp; lookbook delivered monthly</li>
+          <li>Showroom booking priority</li>
+        </ul>
+        <a href="#" class="btn ghost">Join Associate</a>
+      </div>
+      <div class="plan featured">
+        <div class="plan-name">Patron</div>
+        <div class="plan-price">$120 <span>/ year</span></div>
+        <ul>
+          <li>Everything in Associate</li>
+          <li>10% trade pricing on the full catalogue</li>
+          <li>Personal design consultation</li>
+          <li>Eligible to request Atelier access</li>
+        </ul>
+        <a href="#" class="btn solid">Become a Patron</a>
+      </div>
+      <div class="plan">
+        <div class="plan-name">Inner Circle</div>
+        <div class="plan-price">By Invite</div>
+        <ul>
+          <li>Everything in Patron</li>
+          <li>Confirmed Atelier admission</li>
+          <li>First look at limited editions</li>
+          <li>An invitation, not an application</li>
+        </ul>
+        <a href="#" class="btn ghost">Learn More</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-top">
+    <div class="foot-brand">
+      <div class="logo-word" style="color:var(--champagne)">CASSAVA</div>
+      <p id="footerTagline">Luxury seating and a private atelier, for those who live well anywhere.</p>
+    </div>
+    <div class="foot-col">
+      <h5>Shop</h5>
+      <a href="#">Sofas</a><a href="#">Sectionals</a><a href="#">Lounge Chairs</a><a href="#">Bespoke</a>
+    </div>
+    <div class="foot-col">
+      <h5>Company</h5>
+      <a href="#">About</a><a href="#">Journal</a><a href="#">Showroom</a><a href="#">Contact</a>
+    </div>
+    <div class="foot-col">
+      <h5>Legal</h5>
+      <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Delivery &amp; Returns</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 CASSAVA. ALL RIGHTS RESERVED.</span>
+    <span>ATELIER ADMISSION IS DISCRETIONARY AND RESERVED FOR ADULTS 18+.</span>
+  </div>
+</footer>
+
+<!-- REQUEST ACCESS MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div id="formView">
+      <h3>Request Access</h3>
+      <p class="sub">Tell us a little about yourself. Requests are reviewed individually; not every request is approved.</p>
+      <form id="accessForm">
+        <div class="field-row">
+          <div class="field"><label>Full Name</label><input type="text" id="reqName" required></div>
+          <div class="field"><label>Email</label><input type="email" id="reqEmail" required></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Phone</label><input type="tel" id="reqPhone" required></div>
+          <div class="field"><label>Country</label><input type="text" id="reqCountry" required></div>
+        </div>
+        <div class="field">
+          <label>Preferred Collection</label>
+          <select id="reqCollection"><option>After Hours</option><option>Designer Diaries</option><option>The Lounge Edit</option></select>
+        </div>
+        <div class="field"><label>Reason for Request</label><textarea id="reqReason"></textarea></div>
+        <div class="field"><label>How did you hear about us?</label><input type="text" id="reqReferral"></div>
+        <div class="agree">
+          <input type="checkbox" id="agreeBox" required>
+          <label for="agreeBox">I confirm I am 18 years or older and agree to the Terms and Privacy Policy.</label>
+        </div>
+        <button type="submit" class="btn solid">Submit Request</button>
+      </form>
+    </div>
+    <div class="success" id="successView">
+      <svg viewBox="0 0 60 60"><circle class="success-circle" cx="30" cy="30" r="26" fill="none" stroke="#c6a15b" stroke-width="2"/><path class="success-check" d="M18 31 L26 39 L42 21" fill="none" stroke="#c6a15b" stroke-width="2.4"/></svg>
+      <h4>Request Received</h4>
+      <p>We'll be in touch if your request is approved.</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { db } from './firebase-config.js';
+  import {
+    collection, doc, query, where, orderBy, onSnapshot, addDoc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+  window.__cassavaDb = db;
+  window.__cassavaFirestore = { collection, doc, query, where, orderBy, onSnapshot, addDoc, serverTimestamp };
+</script>
+<script>
+  // ---- Mode toggle: Shop <-> Atelier (signature interaction) ----
+  const modeToggle = document.getElementById('modeToggle');
+  modeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('atelier');
+    const on = document.body.classList.contains('atelier');
+    document.getElementById('lblShop').classList.toggle('active', !on);
+    document.getElementById('lblAtelier').classList.toggle('active', on);
+    if(on) document.getElementById('atelier').scrollIntoView({behavior:'smooth'});
+    else document.getElementById('shop').scrollIntoView({behavior:'smooth'});
+  });
+
+  // ---- Ticker content ----
+  const tickerItems = ['Signature Collection','Bespoke Orders','Showroom Visits','International Designers','Limited Editions','The Atelier'];
+  const track = document.getElementById('tickerTrack');
+  [...tickerItems, ...tickerItems].forEach(t=>{
+    const el = document.createElement('div');
+    el.className='ticker-item';
+    el.innerHTML = `<span class="dot"></span><span>${t}</span>`;
+    track.appendChild(el);
+  });
+
+  // ---- Shop grid: live from Firestore `products` (visibility == 'published'),
+  // falling back to placeholder cards only if the catalogue is empty ----
+  const shopGrid = document.getElementById('shopGrid');
+  const glowClasses = ['g1','g2','g3','g4'];
+
+  function renderProductCard(p, i){
+    const card = document.createElement('div');
+    card.className='product-card';
+    const priceText = p.price ? `From $${Number(p.price).toLocaleString()}` : (p.priceLabel || 'Price on request');
+    const imageLayer = p.imageUrl
+      ? `<img src="${p.imageUrl}" alt="${p.name||''}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">`
+      : `<div class="ph-glow ${glowClasses[i % glowClasses.length]}"></div>`;
+    card.innerHTML = `
+      <div class="ph" data-label="${p.imageUrl ? '' : 'Fabric preview'}">
+        ${imageLayer}
+      </div>
+      <div class="product-info">
+        <h4>${p.name || 'Untitled Piece'}</h4>
+        <div class="product-meta">
+          <span class="product-price">${priceText}</span>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>`;
+    card.querySelector('.wishlist-btn').addEventListener('click', e=>{
+      e.stopPropagation();
+      e.target.classList.toggle('active');
+      e.target.textContent = e.target.classList.contains('active') ? '♥' : '♡';
+    });
+    return card;
+  }
+
+  const placeholderProducts = [
+    {name:'The Ansel Sofa', price:2400},
+    {name:'Marlowe Sectional', price:3200},
+    {name:'Solene Lounge Chair', price:850},
+    {name:'Rune Daybed', price:1450},
+  ];
+
+  (function initShop(){
+    if (!window.__cassavaDb) { placeholderProducts.forEach((p,i)=>shopGrid.appendChild(renderProductCard(p,i))); return; }
+    const { collection, query, where, onSnapshot } = window.__cassavaFirestore;
+    const q = query(collection(window.__cassavaDb, 'products'), where('visibility','==','published'));
+    onSnapshot(q, snap => {
+      shopGrid.innerHTML = '';
+      if (snap.empty) { placeholderProducts.forEach((p,i)=>shopGrid.appendChild(renderProductCard(p,i))); return; }
+      snap.docs.forEach((d,i) => shopGrid.appendChild(renderProductCard(d.data(), i)));
+    }, err => {
+      console.error('Failed to load products, showing placeholders', err);
+      shopGrid.innerHTML = '';
+      placeholderProducts.forEach((p,i)=>shopGrid.appendChild(renderProductCard(p,i)));
+    });
+  })();
+
+  // ---- Collections: live from Firestore `collections` (visibility != 'hidden'),
+  // falling back to placeholder cards if none exist yet. First result renders
+  // large, next two stacked — matching the original layout. ----
+  const collGrid = document.getElementById('collGrid');
+  const collGlows = [
+    'radial-gradient(ellipse at 40% 60%, var(--walnut), transparent 70%)',
+    'radial-gradient(ellipse at 60% 40%, var(--champagne-dim), transparent 70%)',
+    'radial-gradient(ellipse at 50% 50%, #5a3c26, transparent 70%)',
+  ];
+  const placeholderCollections = [
+    {tag:'Flagship', title:'The Cassava Signature Collection'},
+    {tag:'Guest Designers', title:'International Collaborations'},
+    {tag:'Limited', title:'Limited Editions & Bespoke'},
+  ];
+
+  function collCardHTML(c, i, small){
+    const bg = c.heroImageUrl
+      ? `background-image:url('${c.heroImageUrl}');background-size:cover;background-position:center;`
+      : '';
+    const glow = c.heroImageUrl ? '' : `<div class="coll-glow" style="background:${collGlows[i % collGlows.length]};"></div>`;
+    return `
+      <div class="coll-card${small?' small':''}" style="${bg}">
+        ${glow}
+        <div class="coll-body">
+          <div class="coll-tag">${c.tag||''}</div>
+          <h3>${c.title||'Untitled Collection'}</h3>
+        </div>
+      </div>`;
+  }
+
+  function renderCollections(list){
+    if (!list.length){ list = placeholderCollections; }
+    const [first, ...rest] = list;
+    let html = collCardHTML(first, 0, false);
+    if (rest.length){
+      html += `<div class="coll-stack">${rest.slice(0,2).map((c,i)=>collCardHTML(c,i+1,true)).join('')}</div>`;
+    }
+    collGrid.innerHTML = html;
+  }
+
+  (function initCollections(){
+    if (!window.__cassavaDb) { renderCollections([]); return; }
+    const { collection, query, orderBy, onSnapshot } = window.__cassavaFirestore;
+    const q = query(collection(window.__cassavaDb, 'collections'), orderBy('sortOrder','asc'));
+    onSnapshot(q, snap => {
+      const list = snap.docs.map(d=>d.data()).filter(c => c.visibility !== 'hidden');
+      renderCollections(list);
+    }, err => {
+      console.error('Failed to load collections, showing placeholders', err);
+      renderCollections([]);
+    });
+  })();
+  // used here only as teaser metadata — never the private media itself),
+  // falling back to placeholder teasers if that collection is empty ----
+  const atelierGrid = document.getElementById('atelierGrid');
+
+  function renderAtelierCard(a){
+    const card = document.createElement('div');
+    card.className='atelier-card';
+    const bgStyle = a.thumbnailUrl ? `background-image:url('${a.thumbnailUrl}');` : '';
+    card.innerHTML = `
+      <div class="atelier-thumb">
+        <div class="atelier-bg" style="${bgStyle}"></div>
+        <div class="atelier-scrim"></div>
+      </div>
+      <span class="lock-badge">🔒 Private</span>
+      <div class="atelier-overlay">
+        <div class="atelier-cat">${a.cat || 'Editorial'}</div>
+        <h3>${a.title || 'Untitled'}</h3>
+        <p class="atelier-desc">${a.desc || ''}</p>
+        <div class="atelier-meta">${a.meta || 'Members only'}</div>
+        <button class="req-btn">Request Access</button>
+      </div>`;
+    card.querySelector('.req-btn').addEventListener('click', e=>{
+      e.stopPropagation();
+      openModal(a.title);
+    });
+    return card;
+  }
+
+  const placeholderAtelier = [
+    {cat:'Film · 12 min', title:'After Hours', desc:'A late conversation, shot in one continuous take.'},
+    {cat:'Editorial', title:'Designer Diaries', desc:'Portraits of the people behind the collections.'},
+    {cat:'Film · 9 min', title:'The Lounge Edit', desc:'Quiet hours, one room, natural light.'},
+  ];
+
+  (function initAtelier(){
+    if (!window.__cassavaDb) { placeholderAtelier.forEach(a=>atelierGrid.appendChild(renderAtelierCard(a))); return; }
+    const { collection, query, where, onSnapshot } = window.__cassavaFirestore;
+    const q = query(collection(window.__cassavaDb, 'videos'), where('visibility','==','public'));
+    onSnapshot(q, snap => {
+      atelierGrid.innerHTML = '';
+      if (snap.empty) { placeholderAtelier.forEach(a=>atelierGrid.appendChild(renderAtelierCard(a))); return; }
+      snap.docs.forEach(d => atelierGrid.appendChild(renderAtelierCard(d.data())));
+    }, err => {
+      console.error('Failed to load atelier teasers, showing placeholders', err);
+      atelierGrid.innerHTML = '';
+      placeholderAtelier.forEach(a=>atelierGrid.appendChild(renderAtelierCard(a)));
+    });
+  })();
+
+  // ---- Modal ----
+  const overlay = document.getElementById('modalOverlay');
+  let requestedTitle = '';
+  function openModal(title){
+    requestedTitle = title || '';
+    overlay.classList.add('open');
+    document.getElementById('formView').style.display='block';
+    document.getElementById('successView').classList.remove('show');
+  }
+  document.getElementById('modalClose').addEventListener('click', ()=>overlay.classList.remove('open'));
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.classList.remove('open'); });
+
+  function detectDevice(){
+    const ua = navigator.userAgent;
+    if (/Mobi|Android/i.test(ua)) return 'Mobile';
+    if (/Tablet|iPad/i.test(ua)) return 'Tablet';
+    return 'Desktop';
+  }
+  function detectBrowser(){
+    const ua = navigator.userAgent;
+    if (ua.includes('Edg')) return 'Edge';
+    if (ua.includes('Chrome')) return 'Chrome';
+    if (ua.includes('Safari')) return 'Safari';
+    if (ua.includes('Firefox')) return 'Firefox';
+    return 'Other';
+  }
+
+  document.getElementById('accessForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+
+    const payload = {
+      name: reqName.value.trim(),
+      email: reqEmail.value.trim(),
+      phone: reqPhone.value.trim(),
+      country: reqCountry.value.trim(),
+      preferredCollection: reqCollection.value || requestedTitle,
+      reason: reqReason.value.trim(),
+      referralSource: reqReferral.value.trim(),
+      status: 'pending',
+      device: detectDevice(),
+      browser: detectBrowser(),
+      platform: navigator.platform || '',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      language: navigator.language,
+      referrer: document.referrer || 'direct',
+    };
+
+    try {
+      if (window.__cassavaDb) {
+        const { collection, addDoc, serverTimestamp } = window.__cassavaFirestore;
+        await addDoc(collection(window.__cassavaDb, 'access_requests'), { ...payload, timestamp: serverTimestamp() });
+      } else {
+        console.warn('Firestore not initialized — request not persisted:', payload);
+      }
+      document.getElementById('formView').style.display='none';
+      document.getElementById('successView').classList.add('show');
+      form.reset();
+    } catch (err) {
+      console.error('Failed to submit access request', err);
+      alert('Something went wrong submitting your request. Please try again.');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  // ---- Scroll reveal ----
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('visible'); obs.unobserve(en.target); } });
+  }, {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+  // ---- Homepage CMS: overrides hardcoded copy above with whatever is set
+  // in Settings → Homepage in admin. If no settings doc exists yet, every
+  // hardcoded default above stays exactly as-is — nothing breaks. ----
+  (function initHomepageCMS(){
+    if (!window.__cassavaDb) return;
+    const { doc, onSnapshot } = window.__cassavaFirestore;
+    onSnapshot(doc(window.__cassavaDb, 'settings', 'homepage'), snap => {
+      if (!snap.exists()) return;
+      const s = snap.data();
+
+      const bar = document.getElementById('announcementBar');
+      if (s.announcementEnabled && s.announcementText) {
+        bar.textContent = s.announcementText;
+        bar.style.display = 'block';
+      } else {
+        bar.style.display = 'none';
+      }
+
+      if (s.heroEyebrow) document.getElementById('heroEyebrow').textContent = s.heroEyebrow;
+      if (s.heroTitleLine1 || s.heroTitleLine2) {
+        document.getElementById('heroTitle').innerHTML =
+          `${s.heroTitleLine1||''}<br><em>${s.heroTitleLine2||''}</em>`;
+      }
+      if (s.heroDescription) document.getElementById('heroDesc').textContent = s.heroDescription;
+      if (s.heroCtaPrimaryText) document.getElementById('heroCtaPrimary').textContent = s.heroCtaPrimaryText;
+      if (s.heroCtaSecondaryText) document.getElementById('heroCtaSecondary').textContent = s.heroCtaSecondaryText;
+
+      if (s.dualityEyebrow) document.getElementById('dualityEyebrow').textContent = s.dualityEyebrow;
+      if (s.dualityTitleLine1 || s.dualityTitleLine2) {
+        document.getElementById('dualityTitle').innerHTML =
+          `${s.dualityTitleLine1||''}<br>${s.dualityTitleLine2||''}`;
+      }
+      if (s.dualityBody) document.getElementById('dualityBody').textContent = s.dualityBody;
+
+      if (s.membershipEyebrow) document.getElementById('membershipEyebrow').textContent = s.membershipEyebrow;
+      if (s.membershipTitleLine1 || s.membershipTitleLine2) {
+        document.getElementById('membershipTitle').innerHTML =
+          `${s.membershipTitleLine1||''}<br><em>${s.membershipTitleLine2||''}</em>`;
+      }
+      if (s.membershipSub) document.getElementById('membershipSub').textContent = s.membershipSub;
+
+      if (Array.isArray(s.plans) && s.plans.length) {
+        const grid = document.getElementById('plansGrid');
+        grid.innerHTML = s.plans.map(p => `
+          <div class="plan${p.featured ? ' featured':''}">
+            <div class="plan-name">${p.name||''}</div>
+            <div class="plan-price">${p.price||''}</div>
+            <ul>${(p.features||[]).map(f=>`<li>${f}</li>`).join('')}</ul>
+            <a href="#" class="btn ${p.featured?'solid':'ghost'}">${p.ctaText||'Learn More'}</a>
+          </div>`).join('');
+      }
+
+      if (s.footerTagline) document.getElementById('footerTagline').textContent = s.footerTagline;
+    }, err => console.error('Homepage settings listener', err));
+  })();
+</script>
+
+</body>
+</html>

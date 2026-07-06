@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cassava Admin — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --matte-black:#0c0b09; --espresso:#1a130d; --champagne:#c6a15b; --champagne-dim:#8f7748;
+    --ivory:#ede6d8; --ivory-dim:rgba(237,230,216,.58); --hairline:rgba(198,161,91,.18);
+    --danger:#c65b4a; --ok:#7fae7f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    min-height:100vh;background:var(--matte-black);color:var(--ivory);font-family:'Inter',sans-serif;font-weight:300;
+    display:flex;align-items:center;justify-content:center;padding:2rem;
+    background-image:radial-gradient(ellipse 55% 60% at 75% 20%, rgba(198,161,91,.08), transparent 60%),
+                      radial-gradient(ellipse 60% 60% at 15% 85%, rgba(74,48,32,.4), transparent 55%);
+  }
+  .card{
+    width:100%;max-width:400px;background:#140f0a;border:1px solid var(--hairline);
+    padding:2.8rem;position:relative;
+    backdrop-filter:blur(10px);
+  }
+  .logo{display:flex;align-items:center;gap:.6rem;justify-content:center;margin-bottom:2rem;}
+  .logo span{font-family:'Fraunces',serif;font-size:1.1rem;letter-spacing:.05em;color:var(--ivory);}
+  h1{font-family:'Fraunces',serif;font-weight:500;font-size:1.6rem;text-align:center;margin-bottom:.4rem;}
+  .sub{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--champagne-dim);text-align:center;margin-bottom:2.2rem;}
+  .field{margin-bottom:1.1rem;}
+  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ivory-dim);margin-bottom:.5rem;}
+  .field input{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--hairline);color:var(--ivory);padding:.8rem .9rem;font-size:.88rem;font-family:'Inter',sans-serif;}
+  .field input:focus{outline:none;border-color:var(--champagne-dim);}
+  .row{display:flex;justify-content:space-between;align-items:center;margin:1.2rem 0 1.6rem;font-size:.78rem;}
+  .remember{display:flex;align-items:center;gap:.5rem;color:var(--ivory-dim);}
+  .remember input{accent-color:var(--champagne);}
+  .forgot{color:var(--champagne-dim);text-decoration:none;cursor:pointer;}
+  .forgot:hover{color:var(--champagne);}
+  button.submit{
+    width:100%;font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+    padding:1rem;border:1px solid var(--champagne);background:var(--champagne);color:var(--matte-black);cursor:pointer;
+    transition:background .3s,opacity .3s;
+  }
+  button.submit:hover{background:var(--ivory);border-color:var(--ivory);}
+  button.submit:disabled{opacity:.5;cursor:not-allowed;}
+  .msg{font-size:.78rem;text-align:center;margin-top:1.2rem;min-height:1.2rem;}
+  .msg.error{color:var(--danger);}
+  .msg.ok{color:var(--ok);}
+  .back{display:block;text-align:center;margin-top:1.8rem;font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.14em;color:var(--ivory-dim);text-decoration:none;}
+  .back:hover{color:var(--champagne);}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 40 40" fill="none"><path d="M8 26 C8 20 12 18 20 18 C28 18 32 20 32 26 L32 30 L8 30 Z" stroke="#c6a15b" stroke-width="1.4"/><path d="M8 26 L8 22 C8 20 9.5 19 11 19" stroke="#c6a15b" stroke-width="1.4"/><path d="M32 26 L32 22 C32 20 30.5 19 29 19" stroke="#c6a15b" stroke-width="1.4"/></svg>
+      <span>CASSAVA</span>
+    </div>
+    <h1>Admin Sign In</h1>
+    <div class="sub">Authorized Staff Only</div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" required autocomplete="current-password">
+      </div>
+      <div class="row">
+        <label class="remember"><input type="checkbox" id="remember" checked> Remember me</label>
+        <a class="forgot" id="forgotLink">Forgot password?</a>
+      </div>
+      <button type="submit" class="submit" id="submitBtn">Sign In</button>
+      <div class="msg" id="msg"></div>
+    </form>
+  </div>
+
+<script type="module">
+  import { auth, db, setPersistence, browserLocalPersistence, browserSessionPersistence }
+    from './firebase-config.js';
+  import {
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+  const form = document.getElementById('loginForm');
+  const msg = document.getElementById('msg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function setMsg(text, kind){
+    msg.textContent = text;
+    msg.className = 'msg ' + (kind || '');
+  }
+
+  // Role check: an authenticated user is only treated as an admin if a
+  // matching document exists at /admins/{uid}. This mirrors the Firestore
+  // rules — auth alone does not grant dashboard access.
+  async function verifyAdminAndRedirect(user){
+    const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+    if (adminDoc.exists()) {
+      window.location.href = './admin.html';
+    } else {
+      await signOut(auth);
+      setMsg('This account is not authorized for admin access.', 'error');
+    }
+  }
+
+  onAuthStateChanged(auth, user => {
+    if (user) verifyAdminAndRedirect(user);
+  });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    setMsg('Signing in…');
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const remember = document.getElementById('remember').checked;
+    try {
+      await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      await verifyAdminAndRedirect(cred.user);
+    } catch (err) {
+      setMsg(friendlyError(err.code), 'error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  document.getElementById('forgotLink').addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim();
+    if (!email) { setMsg('Enter your email above first, then click "Forgot password?" again.', 'error'); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMsg('Password reset email sent.', 'ok');
+    } catch (err) {
+      setMsg(friendlyError(err.code), 'error');
+    }
+  });
+
+  function friendlyError(code){
+    switch(code){
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found': return 'Incorrect email or password.';
+      case 'auth/too-many-requests': return 'Too many attempts. Try again shortly.';
+      case 'auth/invalid-email': return 'Enter a valid email address.';
+      default: return 'Something went wrong. Please try again.';
+    }
+  }
+</script>
+</body>
+</html>
