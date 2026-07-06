@@ -1,7 +1,7 @@
 // firebase-config.js
-// Shared Firebase v11 initialization for Cassava.
-// Follows the DettyVerse pattern: one Firebase project, one named Firestore
-// database per product. Drop your real config values in below.
+// Shared Firebase v11 initialization for DettyVerse products.
+// One Firebase project, one named Firestore database per product —
+// change TARGET_DATABASE below to point this file at a different product.
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import {
@@ -12,8 +12,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-storage.js";
+import { getFunctions } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js";
 
-// TODO: replace with your real DettyVerse web app config
 // ---------- FIREBASE CONFIG ----------
 const firebaseConfig = {
   apiKey: "AIzaSyD_GjkTox5tum9o4AupO0LeWzjTocJg8RI",
@@ -25,21 +25,26 @@ const firebaseConfig = {
   measurementId: "G-NX2KWZW85V"
 };
 
-const app = initializeApp(firebaseConfig);
-
 // ====================== DATABASE SELECTION ======================
-const TARGET_DATABASE = "chrge";   // ← Change this line when needed
+// Change this one line per product — everything else in this file stays the same.
+const TARGET_DATABASE = "chrge"; // e.g. "cassava", "chrge", "cube", "bidbanta", "gring"
 
-const db = getFirestore(app, TARGET_DATABASE);
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const functions = getFunctions(app, "europe-west1");   // Better for Nigeria
+const db = getFirestore(app, TARGET_DATABASE);
+const storage = getStorage(app);
+const functions = getFunctions(app, "europe-west1"); // closer region for Nigeria/Ghana traffic
 
-console.log(`📦 Connected to Firestore Database: ${TARGET_DATABASE}`);
+console.log(`📦 Connected to Firestore database: ${TARGET_DATABASE}`);
 console.log("☁️ Functions region: europe-west1");
 
-// Named database "cassava" — keeps this product's data isolated from
-// CUBE / BidBanta / CHRGE+ / Gring inside the same dettyverse project.
-export const db = getFirestore(app, "chrge");
-export const storage = getStorage(app);
-
-export { setPersistence, browserLocalPersistence, browserSessionPersistence };
+export {
+  app,
+  auth,
+  db,
+  storage,
+  functions,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence
+};
