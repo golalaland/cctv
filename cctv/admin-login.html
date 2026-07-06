@@ -100,11 +100,13 @@
     msg.className = 'msg ' + (kind || '');
   }
 
+  
   // Role check: an authenticated user is only treated as an admin if a
   // matching document exists at /admins/{uid}. This mirrors the Firestore
   // rules — auth alone does not grant dashboard access.
-  async function verifyAdminAndRedirect(user){
-    const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+ async function verifyAdminAndRedirect(user){
+  console.log('Checking admin doc for UID:', user.uid); // TEMP — remove after debugging
+  const adminDoc = await getDoc(doc(db, 'admins', user.uid));
     if (adminDoc.exists()) {
       window.location.href = './admin.html';
     } else {
