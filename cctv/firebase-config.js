@@ -27,7 +27,7 @@ const firebaseConfig = {
 
 // ====================== DATABASE SELECTION ======================
 // Change this one line per product — everything else in this file stays the same.
-const TARGET_DATABASE = "chrge"; // e.g. "cassava", "chrge", "cube", "bidbanta", "gring"
+const TARGET_DATABASE = "cctv"; // e.g. "cassava", "cctv", "cube", "bidbanta", "gring"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
