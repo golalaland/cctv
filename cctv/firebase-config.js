@@ -1,3 +1,5 @@
+
+
 // firebase-config.js
 // Shared Firebase v11 initialization for DettyVerse products.
 // One Firebase project, one named Firestore database per product —
