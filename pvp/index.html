@@ -253,6 +253,33 @@
   </ul>
 </nav>
 
+  <!-- SCHEDULE -->
+<section class="schedule" id="schedule">
+  <div class="section-inner">
+    <div class="section-label">Upcoming</div>
+    <h2 class="section-title">Episode Schedule</h2>
+    <div class="sched-list" id="schedList"></div>
+  </div>
+</section>
+
+<!-- LEADERBOARD -->
+<section class="leaderboard" id="leaderboard">
+  <div class="section-inner">
+    <div class="section-label">Current Season</div>
+    <h2 class="section-title">Player Leaderboard</h2>
+    <div class="lb-table">
+      <div class="lb-header">
+        <div>#</div>
+        <div>Player</div>
+        <div>Wins</div>
+        <div class="lb-col-matches">Matches</div>
+        <div class="lb-col-prize">Prize Earned</div>
+      </div>
+      <div id="lbRows"></div>
+    </div>
+  </div>
+</section>
+
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="hero-bg"></div>
@@ -396,6 +423,50 @@
         ${c.prize ? `<div class="game-prize">${esc(c.prize)}</div>` : ''}
       </div>
     `).join('');
+  });
+  // SCHEDULE — live from episodes collection
+  const STATUS_LABEL = { live:"Live Tonight", upcoming:"Upcoming", finale:"Season Finale", soon:"Coming Soon" };
+  bindCollection("episodes", (rows) => {
+    const list = document.getElementById('schedList');
+    if(!list || !rows.length) return;
+    list.innerHTML = rows.map(e => {
+      const st = (e.status || 'upcoming').toLowerCase();
+      const label = STATUS_LABEL[st] || e.status || 'Upcoming';
+      return `
+        <div class="ep-row">
+          <div class="ep-date">${esc(e.date || '')}</div>
+          <div class="ep-main">
+            <div class="ep-title">${esc(e.title || '')}</div>
+            <div class="ep-game">${esc(e.game || '')}</div>
+          </div>
+          <div class="ep-prize">${esc(e.prize || '')}</div>
+          <div class="ep-status ${esc(st)}">${esc(label)}</div>
+        </div>`;
+    }).join('');
+  });
+
+  // LEADERBOARD — live from players collection
+  bindCollection("players", (rows) => {
+    const box = document.getElementById('lbRows');
+    if(!box || !rows.length) return;
+    box.innerHTML = rows.map((p, i) => {
+      const rank = i + 1;
+      const topClass = rank <= 3 ? ` top-${rank}` : '';
+      return `
+        <div class="lb-row${topClass}">
+          <div class="lb-rank">${rank}</div>
+          <div class="lb-player">
+            <div class="lb-avatar" style="background:${esc(p.color || '#8B0000')};">${esc(p.avatar || (p.name||'?')[0])}</div>
+            <div style="min-width:0;">
+              <div class="lb-name">${esc(p.name || '')}</div>
+              <div class="lb-handle">@${esc(p.handle || '')}</div>
+            </div>
+          </div>
+          <div class="lb-wins">${esc(p.wins ?? 0)}</div>
+          <div class="lb-matches lb-col-matches">${esc(p.matches ?? 0)}</div>
+          <div class="lb-prize">${esc(p.prize || '')}</div>
+        </div>`;
+    }).join('');
   });
 </script>
 </body>
