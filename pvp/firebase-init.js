@@ -28,7 +28,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Named database — the "pvp" DB inside the dettyverse project
-const db = getFirestore(app, "pvp");
+const db = getFirestore(app, "pvpstrip");
 const auth = getAuth(app);
 const storage = getStorage(app);
 
