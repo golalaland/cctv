@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PvP Bang — Play. Win. Bang.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:#FF1744; --red-dim:#8B0000; --gold:#FFD700; --gold-dim:#B8960C;
+    --white:#F5F0E8; --dark:#0D0D0D; --darker:#080808;
+    --glass:rgba(255,255,255,0.04); --glass-border:rgba(255,255,255,0.08);
+    --tab-h:64px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+  body{
+    background:var(--darker);color:var(--white);
+    font-family:'Barlow Condensed',sans-serif;font-size:18px;
+    overflow-x:hidden;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom));
+  }
+  @media(min-width:900px){ body{padding-bottom:0;} }
+
+  /* SCANLINES + NOISE — your themes, kept */
+  body::before{content:'';position:fixed;inset:0;z-index:100;pointer-events:none;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px);}
+  body::after{content:'';position:fixed;inset:0;z-index:99;pointer-events:none;opacity:0.35;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");}
+
+  /* ELIGIBILITY GATE (prizes, not adult) */
+  .gate{position:fixed;inset:0;z-index:1000;background:var(--darker);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:32px;transition:opacity .4s;}
+  .gate.gone{opacity:0;pointer-events:none;}
+  .gate-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.6rem,9vw,3.5rem);letter-spacing:.05em;margin-bottom:8px;}
+  .gate-logo span{color:var(--red);}
+  .gate-badge{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.18em;
+    color:rgba(245,240,232,.35);text-transform:uppercase;margin-bottom:40px;}
+  .gate-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,7vw,3.4rem);margin-bottom:14px;}
+  .gate-sub{font-size:1rem;color:rgba(245,240,232,.5);max-width:360px;line-height:1.65;margin-bottom:40px;}
+  .gate-btns{display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px;}
+  .gate-yes{background:var(--red);border:none;color:var(--white);font-family:'Bebas Neue',sans-serif;
+    font-size:1.35rem;letter-spacing:.08em;padding:16px;cursor:pointer;transition:background .2s;}
+  .gate-yes:active{background:#cc0033;}
+  .gate-no{background:none;border:1px solid var(--glass-border);color:rgba(245,240,232,.4);
+    font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.1em;padding:15px;
+    cursor:pointer;text-transform:uppercase;}
+
+  /* TOP BAR (desktop) */
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:500;display:none;
+    align-items:center;justify-content:space-between;padding:20px 48px;
+    background:linear-gradient(to bottom,rgba(8,8,8,.95),transparent);backdrop-filter:blur(2px);}
+  .topbar .brand{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.05em;color:var(--white);text-decoration:none;}
+  .topbar .brand span{color:var(--red);}
+  .topbar-links{display:flex;gap:32px;align-items:center;list-style:none;}
+  .topbar-links a{font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.15em;
+    text-transform:uppercase;color:rgba(245,240,232,.55);text-decoration:none;transition:color .2s;}
+  .topbar-links a:hover{color:var(--white);}
+  .topbar-cta{background:var(--red);color:var(--white)!important;padding:8px 20px;}
+  @media(min-width:900px){ .topbar{display:flex;} }
+
+  /* BOTTOM TAB BAR (mobile) */
+  .tabbar{position:fixed;bottom:0;left:0;right:0;z-index:500;height:var(--tab-h);
+    display:flex;align-items:stretch;
+    padding-bottom:env(safe-area-inset-bottom);
+    background:rgba(10,10,12,.92);backdrop-filter:blur(12px);
+    border-top:1px solid var(--glass-border);}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;-webkit-tap-highlight-color:transparent;}
+  .tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;}
+  .tab span{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;}
+  .tab.active{color:var(--red);}
+  .tab.cta{color:var(--red);}
+  @media(min-width:900px){ .tabbar{display:none;} }
+
+  /* HERO */
+  .hero{min-height:100svh;display:flex;align-items:center;position:relative;overflow:hidden;padding:0 24px;}
+  @media(min-width:900px){ .hero{padding:0 48px;} }
+  .hero-bg{position:absolute;inset:0;background:
+    radial-gradient(ellipse 60% 80% at 70% 50%,rgba(255,23,68,.12) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 60% at 20% 80%,rgba(255,215,0,.05) 0%,transparent 60%),
+    linear-gradient(135deg,#0D0D0D 0%,#0a0000 50%,#0D0D0D 100%);}
+  .hero-grid{position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,23,68,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,23,68,.06) 1px,transparent 1px);
+    background-size:48px 48px;animation:gridMove 20s linear infinite;}
+  @keyframes gridMove{0%{transform:perspective(500px) rotateX(10deg) translateY(0);}100%{transform:perspective(500px) rotateX(10deg) translateY(48px);}}
+  .hero-content{position:relative;z-index:2;max-width:800px;}
+  .hero-tag{font-family:'Space Mono',monospace;font-size:.66rem;letter-spacing:.16em;color:var(--red);
+    text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:10px;animation:fadeUp .8s ease both;}
+  .hero-tag::before{content:'';width:32px;height:1px;background:var(--red);}
+  .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(4.2rem,18vw,11rem);line-height:.9;
+    letter-spacing:-.01em;margin-bottom:22px;animation:fadeUp .8s .15s ease both;}
+  .hero-title .red{color:var(--red);}
+  .hero-title .stroke{-webkit-text-stroke:1px var(--white);color:transparent;}
+  .glitch{position:relative;}
+  .glitch::before,.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;opacity:0;}
+  .glitch::before{color:var(--red);clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%);animation:glitch1 4s 2s infinite;}
+  .glitch::after{color:#00ffff;clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%);animation:glitch2 4s 2.1s infinite;}
+  @keyframes glitch1{0%,90%,100%{opacity:0;transform:none}92%{opacity:1;transform:translateX(-3px)}94%{opacity:0}96%{opacity:1;transform:translateX(3px)}98%{opacity:0}}
+  @keyframes glitch2{0%,90%,100%{opacity:0;transform:none}92%{opacity:1;transform:translateX(3px)}94%{opacity:0}96%{opacity:1;transform:translateX(-3px)}98%{opacity:0}}
+  .hero-sub{font-size:1.15rem;font-weight:300;color:rgba(245,240,232,.65);line-height:1.5;
+    max-width:440px;margin-bottom:32px;animation:fadeUp .8s .3s ease both;}
+  .hero-sub strong{color:var(--white);font-weight:600;}
+  .hero-actions{display:flex;flex-direction:column;gap:12px;align-items:stretch;animation:fadeUp .8s .45s ease both;}
+  @media(min-width:600px){ .hero-actions{flex-direction:row;align-items:center;} }
+  .btn-primary{background:var(--red);color:var(--white);font-family:'Bebas Neue',sans-serif;
+    font-size:1.2rem;letter-spacing:.1em;padding:16px 40px;border:none;cursor:pointer;text-decoration:none;
+    text-align:center;position:relative;overflow:hidden;transition:transform .15s;}
+  .btn-primary:active{transform:scale(.98);}
+  .btn-outline{border:1px solid rgba(245,240,232,.25);color:var(--white);font-family:'Space Mono',monospace;
+    font-size:.72rem;letter-spacing:.12em;padding:16px 32px;text-decoration:none;text-align:center;
+    text-transform:uppercase;transition:border-color .2s,color .2s;}
+  .btn-outline:active{border-color:var(--red);color:var(--red);}
+  .hero-stats{display:flex;gap:28px;margin-top:44px;animation:fadeUp .8s .6s ease both;}
+  @media(min-width:900px){ .hero-stats{position:absolute;right:48px;bottom:80px;margin-top:0;flex-direction:column;gap:24px;text-align:right;} }
+  .stat-num{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;line-height:1;color:var(--red);}
+  .stat-label{font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.12em;color:rgba(245,240,232,.4);text-transform:uppercase;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+  /* TICKER */
+  .ticker{background:var(--red);padding:10px 0;overflow:hidden;white-space:nowrap;}
+  .ticker-inner{display:inline-flex;animation:ticker 30s linear infinite;}
+  .ticker-item{font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.14em;
+    text-transform:uppercase;padding:0 36px;display:inline-flex;align-items:center;}
+  .ticker-item::before{content:'★';margin-right:16px;font-size:.7em;}
+  @keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+</style>
+</head>
+<body>
+
+<!-- ELIGIBILITY GATE -->
+<div class="gate" id="gate">
+  <div class="gate-logo" id="gateLogo">PvP<span>Bang</span></div>
+  <div class="gate-badge">Skill-Based Cash Competition</div>
+  <h2 class="gate-title" id="gateTitle">Ready to Compete?</h2>
+  <p class="gate-sub" id="gateSub">PvP Bang awards real cash prizes. You must be 18 or older to win. Void where prohibited.</p>
+  <div class="gate-btns">
+    <button class="gate-yes" onclick="enterSite()">I'm 18+ · Enter</button>
+    <button class="gate-no" onclick="location.href='https://google.com'">Exit</button>
+  </div>
+</div>
+
+<!-- TOP BAR (desktop) -->
+<nav class="topbar">
+  <a href="#home" class="brand" id="brandTop">PvP<span>Bang</span></a>
+  <ul class="topbar-links">
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#games">Games</a></li>
+    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#leaderboard">Leaderboard</a></li>
+    <li><a href="#prizes">Prizes</a></li>
+    <li><a href="#join" class="topbar-cta btn-primary" style="font-size:.72rem;padding:8px 20px;">Watch Now</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag" id="heroTag">Live Every Friday Night · 18+</div>
+    <h1 class="hero-title">
+      <span class="glitch" id="ht1" data-text="PLAY.">PLAY.</span><br>
+      <span class="red glitch" id="ht2" data-text="WIN.">WIN.</span><br>
+      <span class="stroke" id="ht3">BANG.</span>
+    </h1>
+    <p class="hero-sub" id="heroSub">The <strong>most electric gaming show on the internet.</strong> Two players go head-to-head in PvP challenges — winner rips the wall and takes the prize.</p>
+    <div class="hero-actions">
+      <a href="#join" class="btn-primary" onclick="openWaitlist();return false;">Join &amp; Watch</a>
+      <a href="#" target="_blank" id="heroX" class="btn-outline">@pvpbang on X</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num" id="s1n">50K+</div><div class="stat-label" id="s1l">Followers on X</div></div>
+      <div><div class="stat-num" id="s2n">200+</div><div class="stat-label" id="s2l">Episodes Aired</div></div>
+      <div><div class="stat-num" id="s3n">30+</div><div class="stat-label" id="s3l">Players Featured</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner" id="tickerInner">
+    <span class="ticker-item">New Episode Every Friday</span>
+    <span class="ticker-item">Real Cash Prizes</span>
+    <span class="ticker-item">Skill-Based PvP</span>
+    <span class="ticker-item">Winner Rips The Wall</span>
+    <span class="ticker-item">New Episode Every Friday</span>
+    <span class="ticker-item">Real Cash Prizes</span>
+    <span class="ticker-item">Skill-Based PvP</span>
+    <span class="ticker-item">Winner Rips The Wall</span>
+  </div>
+</div>
+
+<!-- BOTTOM TAB BAR (mobile) -->
+<nav class="tabbar">
+  <a href="#home" class="tab active" data-sec="home">
+    <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Home</span>
+  </a>
+  <a href="#games" class="tab" data-sec="games">
+    <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="3"/><path d="M7 12h2M8 11v2"/><circle cx="16" cy="11" r="1"/><circle cx="18" cy="13" r="1"/></svg><span>Games</span>
+  </a>
+  <a href="#schedule" class="tab" data-sec="schedule">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Schedule</span>
+  </a>
+  <a href="#leaderboard" class="tab" data-sec="leaderboard">
+    <svg viewBox="0 0 24 24"><path d="M6 21v-7M12 21V9M18 21v-4"/><path d="M4 21h16"/></svg><span>Ranks</span>
+  </a>
+  <a href="#join" class="tab cta" data-sec="join">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>Watch</span>
+  </a>
+</nav>
+
+<script type="module">
+  import { bindDoc } from "./render.js";
+
+  // Gate — once per session
+  window.enterSite = function(){
+    document.getElementById('gate').classList.add('gone');
+    sessionStorage.setItem('pvp_gate','1');
+    setTimeout(()=>document.getElementById('gate').style.display='none',400);
+  };
+  if(sessionStorage.getItem('pvp_gate')){
+    const g=document.getElementById('gate'); g.style.display='none';
+  }
+
+  window.openWaitlist = function(){ location.hash='#join'; }; // wired to modal in a later block
+
+  // Live-bind hero + gate + brand to settings/site
+  bindDoc("settings/site", (d) => {
+    const set=(id,v)=>{const e=document.getElementById(id); if(e&&v!=null) e.textContent=v;};
+    if(d.brand){
+      const parts=d.brand.split(" ");
+      const html = parts.length>1 ? `${parts[0]}<span>${parts.slice(1).join(" ")}</span>` : d.brand;
+      document.getElementById('brandTop').innerHTML=html;
+      document.getElementById('gateLogo').innerHTML=html;
+    }
+    set('heroTag',d.heroTag); set('heroSub',d.heroSub);
+    set('gateTitle',d.gateTitle); set('gateSub',d.gateSub);
+    ['ht1','ht2','ht3'].forEach((id,i)=>{const v=d[`heroTitle${i+1}`]; const e=document.getElementById(id); if(e&&v){e.textContent=v;e.setAttribute('data-text',v);}});
+    set('s1n',d.stat1num);set('s1l',d.stat1label);
+    set('s2n',d.stat2num);set('s2l',d.stat2label);
+    set('s3n',d.stat3num);set('s3l',d.stat3label);
+    if(d.xHandle){const x=document.getElementById('heroX'); x.href=`https://x.com/${d.xHandle}`; x.textContent=`@${d.xHandle} on X`;}
+  }, {});
+
+  // Active tab on scroll
+  const secs=['home','games','schedule','leaderboard','join'];
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.sec===e.target.id));
+  }});},{threshold:.4});
+  secs.forEach(id=>{const el=document.getElementById(id); if(el) io.observe(el);});
+</script>
+</body>
+</html>
