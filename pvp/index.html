@@ -353,6 +353,47 @@
   </div>
 </section>
 
+  <!-- PRIZES -->
+<section class="prizes" id="prizes">
+  <div class="section-inner">
+    <div class="section-label">Winner's Circle</div>
+    <h2 class="section-title">What Winners Take Home</h2>
+    <div class="prizes-grid" id="prizesGrid"></div>
+  </div>
+</section>
+
+<!-- JOIN -->
+<section class="join" id="join">
+  <div class="join-content">
+    <div class="section-label" style="justify-content:center;">Exclusive Access</div>
+    <h2 class="join-title">Ready to<br><span class="accent">Watch?</span></h2>
+    <p class="join-sub" id="joinSub">Clips on X. Full episodes every Friday for the community. Join the waitlist now.</p>
+    <div class="join-actions">
+      <a href="#" class="btn-primary" onclick="openWaitlist();return false;">Join the Waitlist</a>
+      <a href="#" target="_blank" id="joinX" class="x-link"><span class="x-icon">𝕏</span> Follow for free clips</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo" id="footLogo">PvP<span>Bang</span></div>
+  <div class="footer-copy" id="footCopy">© 2025 PvP Bang · Skill-Based Cash Competition · 18+ to Win</div>
+  <div class="footer-links">
+    <a href="#">Terms</a><a href="#">Privacy</a><a href="#">Rules</a>
+    <a href="#" id="footX" target="_blank">@pvpbang</a>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeWaitlist()">✕</button>
+    <div id="modalForm">
+      <div class="modal-title">Join the Waitlist</div>
+      <div class="modal-sub">Full episodes · Community access</div>
+      <div class="modal-field"><label>Your Name</label><input type="text"
+
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="hero-bg"></div>
@@ -445,6 +486,8 @@
 
 <script type="module">
  import { bindDoc, bindCollection, esc } from "./render.js";
+   import { db, addDoc, collection, serverTimestamp } from "./firebase-init.js";
+
 
   // Gate — once per session
   window.enterSite = function(){
@@ -541,6 +584,45 @@
         </div>`;
     }).join('');
   });
+
+  bindCollection("prizes", (rows) => {
+    const grid = document.getElementById('prizesGrid');
+    if(!grid || !rows.length) return;
+    grid.innerHTML = rows.map(p => `
+      <div class="prize-card${p.featured ? ' featured' : ''}">
+        ${p.featured ? '<div class="prize-badge">GRAND</div>' : ''}
+        <span class="prize-icon">${esc(p.icon || '🏆')}</span>
+        <div class="prize-tier">${esc(p.tier || '')}</div>
+        <div class="prize-name">${esc(p.name || '')}</div>
+        <div class="prize-value">${esc(p.value || '')}</div>
+      </div>`).join('');
+  });
+
+  window.openWaitlist = () => document.getElementById('modal').classList.add('active');
+  window.closeWaitlist = () => document.getElementById('modal').classList.remove('active');
+  document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') closeWaitlist(); });
+  document.addEventListener('keydown', e => { if(e.key==='Escape') closeWaitlist(); });
+
+  window.submitWaitlist = async () => {
+    const name = document.getElementById('wlName').value.trim();
+    const email = document.getElementById('wlEmail').value.trim();
+    const source = document.getElementById('wlSource').value;
+    if(!name || !email){
+      document.getElementById('wlName').style.borderColor = name ? '' : 'var(--red)';
+      document.getElementById('wlEmail').style.borderColor = email ? '' : 'var(--red)';
+      return;
+    }
+    const btn = document.getElementById('wlSubmit');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    try {
+      await addDoc(collection(db,'waitlist'), { name, email, source, created: serverTimestamp() });
+      document.getElementById('modalForm').style.display='none';
+      document.getElementById('modalSuccess').classList.add('visible');
+    } catch(err){
+      console.error('waitlist submit failed:', err);
+      btn.disabled=false; btn.textContent='Try Again';
+    }
+  };
 </script>
 </body>
 </html>
