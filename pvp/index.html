@@ -125,6 +125,50 @@
     text-transform:uppercase;padding:0 36px;display:inline-flex;align-items:center;}
   .ticker-item::before{content:'★';margin-right:16px;font-size:.7em;}
   @keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+  /* SECTION COMMON */
+  section{position:relative;}
+  .section-inner{max-width:1200px;margin:0 auto;padding:0 24px;}
+  @media(min-width:900px){ .section-inner{padding:0 48px;} }
+  .section-label{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--red);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .section-label::before{content:'//';opacity:.5;}
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.6rem,9vw,5.5rem);line-height:.95;margin-bottom:20px;}
+
+  /* HOW IT WORKS */
+  .hiw{padding:80px 0;background:linear-gradient(to bottom,var(--darker),var(--dark));}
+  @media(min-width:900px){ .hiw{padding:120px 0;} }
+  .hiw-steps{display:flex;flex-direction:column;margin-top:40px;}
+  .step{display:flex;gap:18px;padding:22px 0;border-bottom:1px solid var(--glass-border);transition:padding-left .3s;}
+  .step:first-child{border-top:1px solid var(--glass-border);}
+  .step-num{font-family:'Bebas Neue',sans-serif;font-size:3rem;line-height:1;color:rgba(245,240,232,.12);min-width:48px;}
+  @media(min-width:900px){ .step-num{font-size:4rem;min-width:60px;} }
+  .step-content h3{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.04em;margin-bottom:6px;}
+  .step-content p{font-size:.98rem;font-weight:300;color:rgba(245,240,232,.55);line-height:1.6;}
+
+  /* GAMES */
+  .games{padding:80px 0;background:var(--darker);}
+  @media(min-width:900px){ .games{padding:120px 0;} }
+  .games-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:40px;}
+  @media(min-width:600px){ .games-grid{grid-template-columns:1fr 1fr;} }
+  @media(min-width:900px){ .games-grid{grid-template-columns:1fr 1fr 1fr;gap:2px;} }
+  .game-card{background:var(--glass);border:1px solid var(--glass-border);padding:28px 24px;
+    position:relative;overflow:hidden;transition:border-color .3s,transform .3s;}
+  .game-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--red);
+    transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+  .game-card:active{transform:translateY(-2px);}
+  .game-card.featured{border-color:rgba(255,23,68,.2);
+    background:linear-gradient(135deg,rgba(255,23,68,.08),rgba(255,23,68,.02));}
+  .game-card.featured::before{transform:scaleX(1);}
+  @media(min-width:600px){ .game-card.featured{grid-column:1 / -1;} }
+  @media(min-width:900px){ .game-card.featured{grid-column:span 2;} }
+  .game-icon{font-size:2.2rem;margin-bottom:16px;display:block;}
+  .game-label{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:var(--red);text-transform:uppercase;margin-bottom:8px;}
+  .game-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.04em;margin-bottom:10px;}
+  .game-desc{font-size:.92rem;font-weight:300;color:rgba(245,240,232,.5);line-height:1.6;}
+  .game-prize{margin-top:20px;display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;
+    font-size:.62rem;letter-spacing:.1em;color:var(--gold);border:1px solid rgba(255,215,0,.2);padding:6px 14px;}
+  .game-prize::before{content:'🏆';font-size:.85em;}
+  
 </style>
 </head>
 <body>
@@ -192,6 +236,39 @@
   </div>
 </div>
 
+  <!-- HOW IT WORKS -->
+<section class="hiw" id="how">
+  <div class="section-inner">
+    <div class="section-label">The Format</div>
+    <h2 class="section-title">How PvP Bang Works</h2>
+    <div class="hiw-steps" id="hiwSteps">
+      <div class="step"><div class="step-num">01</div><div class="step-content">
+        <h3>Two Players Enter</h3>
+        <p>Two players face off in a randomly selected PvP game — fighting games, arcade classics, trivia showdowns.</p></div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-content">
+        <h3>Best-Of Decides It</h3>
+        <p>Rounds stack up. First to clinch the set wins the match. No edits, no script — pure skill on the sticks.</p></div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-content">
+        <h3>Winner Rips The Wall</h3>
+        <p>The champion rips a plaster off the prize wall — cash voucher or a live challenge command hidden underneath. No pity prizes.</p></div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-content">
+        <h3>Fans Watch Live</h3>
+        <p>Clips drop on X. Full episodes stream every Friday night for the community.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- GAMES -->
+<section class="games" id="games">
+  <div class="section-inner">
+    <div class="section-label">The Games</div>
+    <h2 class="section-title">PvP Challenge Formats</h2>
+    <div class="games-grid" id="gamesGrid">
+      <!-- filled from challenges collection -->
+    </div>
+  </div>
+</section>
+
 <!-- BOTTOM TAB BAR (mobile) -->
 <nav class="tabbar">
   <a href="#home" class="tab active" data-sec="home">
@@ -212,7 +289,7 @@
 </nav>
 
 <script type="module">
-  import { bindDoc } from "./render.js";
+ import { bindDoc, bindCollection, esc } from "./render.js";
 
   // Gate — once per session
   window.enterSite = function(){
@@ -250,6 +327,21 @@
     document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.sec===e.target.id));
   }});},{threshold:.4});
   secs.forEach(id=>{const el=document.getElementById(id); if(el) io.observe(el);});
+  // GAMES — live from challenges collection
+  bindCollection("challenges", (rows) => {
+    const grid = document.getElementById('gamesGrid');
+    if(!grid) return;
+    if(!rows.length){ return; } // keep nothing rather than flash empty
+    grid.innerHTML = rows.map(c => `
+      <div class="game-card${c.featured ? ' featured' : ''}">
+        <span class="game-icon">${esc(c.icon || '🎮')}</span>
+        <div class="game-label">${esc(c.label || '')}</div>
+        <div class="game-title">${esc(c.title || '')}</div>
+        <p class="game-desc">${esc(c.desc || '')}</p>
+        ${c.prize ? `<div class="game-prize">${esc(c.prize)}</div>` : ''}
+      </div>
+    `).join('');
+  });
 </script>
 </body>
 </html>
