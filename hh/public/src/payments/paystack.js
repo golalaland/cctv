@@ -12,7 +12,7 @@
  */
 
 const PAYSTACK_SCRIPT_URL = 'https://js.paystack.co/v1/inline.js';
-const PAYSTACK_PUBLIC_KEY = 'pk_test_9446fa6b81888ffce77cc94294530d761aac4ccd';
+const PAYSTACK_PUBLIC_KEY = 'REPLACE_WITH_PAYSTACK_PUBLIC_KEY';
 
 let scriptLoadPromise = null;
 

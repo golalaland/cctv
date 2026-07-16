@@ -1,22 +1,25 @@
 /**
  * app.js
  *
- * Application boot sequence. Responsibilities at this stage (Module 1):
+ * Application boot sequence:
  *   1. Mount the lounge entry gate.
- *   2. Once passed, mount a bare app shell container.
- *
- * Later modules extend this file's `mountAppShell()` to route between
- * guest login, host login, and the main chatroom shell — none of that
- * exists yet, so this intentionally stops at a clean handoff point
- * rather than stubbing routes that would just be dead code today.
+ *   2. Once passed, mount the app shell — either the guest login screen,
+ *      or (if a session already exists in sessionStorage, e.g. page
+ *      refresh mid-session) straight into the main room.
+ *   3. The main room = a small top bar (username, session countdown,
+ *      leave button) + the realtime chat panel from the Chat System
+ *      module. Gallery / Now Playing / bottom nav don't exist yet — this
+ *      is an honest reflection of what's actually built so far, not a
+ *      stub pretending to be more.
  */
 
 import { mountLoungeGate } from './lounge-gate.js';
 import { createEl } from '../shared/utilities.js';
 import { mountGuestLogin } from '../guest/guest-login.js';
-import { startSessionTimer } from '../guest/session-timer.js';
-import { hasActiveSession } from '../guest/session-store.js';
+import { startSessionTimer, stopSessionTimer, getFormattedTimeRemaining } from '../guest/session-timer.js';
+import { hasActiveSession, getUsername, clearSession } from '../guest/session-store.js';
 import { showErrorToast } from '../shared/toast.js';
+import { mountChat } from '../chat/chat-ui.js';
 
 // Importing firebase-config.js triggers Firebase app initialization and
 // (in development) emulator connection as a side effect.
@@ -39,27 +42,79 @@ function mountAppShell(root) {
         window.location.reload();
       },
     });
-    mountAuthenticatedPlaceholder(shell);
+    mountMainRoom(shell);
     return;
   }
 
   mountGuestLogin(shell, () => {
     shell.innerHTML = '';
-    mountAuthenticatedPlaceholder(shell);
+    mountMainRoom(shell);
   });
 }
 
-function mountAuthenticatedPlaceholder(shell) {
-  // The main chatroom shell (top bar, Now Playing, chat, bottom nav)
-  // doesn't exist yet — that's the Chat System / Now Playing modules.
-  // This is an intentional, honest stopping point rather than a stub
-  // route pretending to be a real screen.
-  shell.appendChild(
-    createEl('div', {
-      classNames: ['authenticated-placeholder'],
-      text: 'You\u2019re in. The main room is being built next.',
-    })
-  );
+function mountMainRoom(shell) {
+  const topBar = buildTopBar();
+  const chatContainer = createEl('div', { classNames: ['main-room-chat'] });
+
+  shell.appendChild(topBar.el);
+  shell.appendChild(chatContainer);
+
+  const teardownChat = mountChat(chatContainer);
+
+  // Keep the top bar's countdown display in sync with the running timer.
+  // startSessionTimer() is already running (either from mountAppShell's
+  // resume path, or from guest-login.js's own call after redemption) —
+  // this just polls the already-ticking countdown to update the badge
+  // text, rather than starting a second timer.
+  const badgeIntervalId = setInterval(() => {
+    const formatted = getFormattedTimeRemaining();
+    if (formatted) {
+      topBar.setCountdown(formatted);
+    } else {
+      clearInterval(badgeIntervalId);
+    }
+  }, 1000);
+
+  topBar.onLeave(() => {
+    clearInterval(badgeIntervalId);
+    teardownChat();
+    stopSessionTimer();
+    clearSession();
+    window.location.reload();
+  });
+}
+
+function buildTopBar() {
+  const usernameEl = createEl('span', {
+    classNames: ['main-room-username'],
+    text: getUsername() || '',
+  });
+
+  const badge = createEl('span', {
+    classNames: ['session-badge'],
+  });
+  const badgeDot = createEl('span', { classNames: ['session-badge-dot'] });
+  const badgeText = createEl('span', { text: '--:--' });
+  badge.appendChild(badgeDot);
+  badge.appendChild(badgeText);
+
+  const leaveBtn = createEl('button', {
+    classNames: ['btn', 'btn-ghost', 'main-room-leave-btn'],
+    attrs: { type: 'button' },
+    text: 'Leave',
+  });
+
+  const el = createEl('header', { classNames: ['main-room-top-bar'] }, [usernameEl, badge, leaveBtn]);
+
+  return {
+    el,
+    setCountdown(formatted) {
+      badgeText.textContent = formatted;
+    },
+    onLeave(handler) {
+      leaveBtn.addEventListener('click', handler);
+    },
+  };
 }
 
 function boot() {

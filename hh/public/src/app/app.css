@@ -1,0 +1,77 @@
+/**
+ * app.css
+ *
+ * Layout for the main room shell (top bar + chat panel), mounted by
+ * app.js after guest login. Gallery/Now Playing/bottom-nav layout will
+ * extend this file when those modules land — kept intentionally minimal
+ * for what actually exists today.
+ */
+
+.app-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-room-top-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: rgba(7, 7, 7, 0.85);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.main-room-username {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-md);
+  color: var(--color-gold-bright);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main-room-top-bar .session-badge {
+  position: static;
+}
+
+.main-room-leave-btn {
+  font-size: var(--text-xs);
+  padding: var(--space-2) var(--space-4);
+}
+
+.main-room-chat {
+  flex: 1;
+  padding: var(--space-4);
+  display: flex;
+}
+
+.main-room-chat .chat-panel {
+  flex: 1;
+  max-height: none;
+}
+
+@media (max-width: 480px) {
+  .main-room-top-bar {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .main-room-chat {
+    padding: 0;
+  }
+
+  .main-room-chat .chat-panel {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
