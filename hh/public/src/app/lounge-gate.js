@@ -14,9 +14,9 @@
  * the access-code redemption logic itself.
  */
 
-import { createEl } from './utilities.js';
-import { STORAGE_KEYS, BRAND } from './constants.js';
-import { prefersReducedMotion } from './utilities.js';
+import { createEl } from '../shared/utilities.js';
+import { STORAGE_KEYS, BRAND } from '../shared/constants.js';
+import { prefersReducedMotion } from '../shared/utilities.js';
 
 /**
  * Mounts the lounge gate into the given root if it hasn't already been

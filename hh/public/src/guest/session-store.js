@@ -20,7 +20,7 @@
  * place server-side session logic lives.
  */
 
-import { STORAGE_KEYS } from './constants.js';
+import { STORAGE_KEYS } from '../shared/constants.js';
 import { store } from '../app/state-store.js';
 
 /** In-memory cache, hydrated from sessionStorage on module load. */
