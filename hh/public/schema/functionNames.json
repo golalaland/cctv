@@ -6,6 +6,7 @@
   "endSession": "cctvMembersEndSession",
   "syncServerTime": "cctvMembersSyncServerTime",
   "getCheckoutDetails": "cctvMembersGetCheckoutDetails",
+  "verifyPayment": "cctvMembersVerifyPayment",
   "paystackWebhook": "cctvMembersPaystackWebhook",
   "sendMessage": "cctvMembersSendMessage",
   "toggleReaction": "cctvMembersToggleReaction",
