@@ -21,6 +21,14 @@ import { fetchMediaPage, fetchCategories, recordView } from './gallery-service.j
 const SKELETON_COUNT = 8;
 const SKELETON_REFILL_COUNT = 4;
 
+/** Format a raw view count as "1.2K" / "3.4M", matching the reels reference style. */
+function formatViewCount(count) {
+  const n = Number(count) || 0;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
+
 /**
  * Mounts the gallery into `root`. Returns a teardown function.
  * @param {HTMLElement} root
@@ -217,16 +225,32 @@ function buildMediaCard(item, index, handleOpen) {
   const mediaEl = item.type === 'video' ? buildVideoThumb(item) : buildPhotoThumb(item);
   card.appendChild(mediaEl);
 
+  if (item.type === 'video') {
+    const playIcon = createEl('div', { classNames: ['gallery-play-icon'], text: '\u25b6' });
+    card.appendChild(playIcon);
+    // Native play/pause/ended events cover both the desktop hover-preview
+    // and the touch-scroll-into-view autoplay paths uniformly, rather than
+    // wiring the icon separately to each interaction method.
+    mediaEl.addEventListener('play', () => playIcon.classList.add('gallery-play-icon-hidden'));
+    mediaEl.addEventListener('pause', () => playIcon.classList.remove('gallery-play-icon-hidden'));
+    mediaEl.addEventListener('ended', () => playIcon.classList.remove('gallery-play-icon-hidden'));
+  }
+
   if (item.premium) {
     card.appendChild(createEl('div', { classNames: ['gallery-lock-badge'], text: '\ud83d\udd12' }));
   }
 
   const overlay = createEl('div', { classNames: ['gallery-card-overlay'] });
-  overlay.appendChild(createEl('span', { classNames: ['gallery-card-host'], text: item.hostName || '' }));
-  const statsRow = createEl('span', { classNames: ['gallery-card-stats'] });
-  statsRow.appendChild(createEl('span', { text: `\u2764\ufe0f ${item.likes || 0}` }));
-  statsRow.appendChild(createEl('span', { text: `\ud83d\udc41\ufe0f ${item.views || 0}` }));
-  overlay.appendChild(statsRow);
+  const viewsRow = createEl('div', {
+    classNames: ['gallery-card-views'],
+    text: `\ud83d\udc41\ufe0f ${formatViewCount(item.views)} views`,
+  });
+  const titleEl = createEl('div', { classNames: ['gallery-card-title'], text: item.title || item.hostName || '' });
+  overlay.appendChild(viewsRow);
+  overlay.appendChild(titleEl);
+  if (item.description) {
+    overlay.appendChild(createEl('div', { classNames: ['gallery-card-description'], text: item.description }));
+  }
   card.appendChild(overlay);
 
   card.addEventListener('click', () => {
