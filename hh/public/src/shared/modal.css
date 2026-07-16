@@ -1,0 +1,84 @@
+/**
+ * modal.css
+ */
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: rgba(2, 2, 2, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-standard);
+}
+
+.modal-overlay.modal-visible {
+  opacity: 1;
+}
+
+.modal-dialog {
+  position: relative;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--color-surface-raised);
+  background-image: var(--gradient-glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-6);
+  transform: translateY(16px) scale(0.98);
+  opacity: 0;
+  transition: transform var(--duration-base) var(--ease-decelerate),
+    opacity var(--duration-base) var(--ease-decelerate);
+}
+
+.modal-overlay.modal-visible .modal-dialog {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.modal-dialog:focus {
+  outline: none;
+}
+
+.modal-sm {
+  max-width: 380px;
+}
+
+.modal-md {
+  max-width: 520px;
+}
+
+.modal-lg {
+  max-width: 760px;
+}
+
+.modal-full {
+  max-width: 96vw;
+  max-height: 96vh;
+}
+
+.modal-close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  font-size: 1.5rem;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay,
+  .modal-dialog {
+    transition: none;
+  }
+}

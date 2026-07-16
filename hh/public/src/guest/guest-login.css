@@ -1,0 +1,164 @@
+/**
+ * guest-login.css
+ */
+
+.guest-login {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.guest-login-heading {
+  font-size: var(--text-xl);
+  text-align: center;
+}
+
+.guest-login-subheading {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.guest-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.field-input {
+  padding: var(--space-3) var(--space-4);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.field-input:focus {
+  border-color: var(--color-gold);
+}
+
+.field-input-invalid {
+  border-color: var(--color-danger);
+}
+
+.field-input-code {
+  font-family: var(--font-mono);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  text-align: center;
+  font-size: var(--text-lg);
+}
+
+.field-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  line-height: var(--leading-normal);
+}
+
+.field-error {
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+  min-height: 1em;
+}
+
+.guest-login-submit {
+  margin-top: var(--space-2);
+}
+
+.guest-login-spinner {
+  align-self: center;
+}
+
+.guest-login-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-tertiary);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.guest-login-divider::before,
+.guest-login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-3);
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  min-height: 120px;
+}
+
+.plan-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.plan-price {
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  color: var(--color-gold-bright);
+}
+
+.plan-buy-btn {
+  margin-top: auto;
+  font-size: var(--text-xs);
+  padding: var(--space-2) var(--space-4);
+}
+
+.plans-error {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+  padding: var(--space-4);
+}
+
+@media (max-width: 480px) {
+  .guest-login {
+    padding: var(--space-6) var(--space-4);
+  }
+}

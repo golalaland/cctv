@@ -1,0 +1,124 @@
+/**
+ * design-tokens.css
+ *
+ * The single source of visual truth for CCTV. Every color, type size,
+ * spacing value, radius, and shadow used anywhere in the app should
+ * reference one of these custom properties — never a raw hex/px value
+ * inline in a feature module's CSS. This is what keeps a platform this
+ * size from drifting into a dozen slightly-different blacks and border
+ * radii as more modules get built.
+ */
+
+:root {
+  /* ── Color: base surfaces ─────────────────────────────────────────── */
+  --color-void: #070707;           /* primary background */
+  --color-surface: #111111;        /* cards, panels, raised surfaces */
+  --color-surface-raised: #171717; /* modals, popovers, above surface */
+  --color-border: rgba(237, 237, 237, 0.08);
+  --color-border-strong: rgba(237, 237, 237, 0.16);
+
+  /* ── Color: accents ───────────────────────────────────────────────── */
+  --color-crimson: #8b1538;
+  --color-crimson-bright: #b31d47;
+  --color-purple: #5b2a86;
+  --color-purple-bright: #7638ab;
+  --color-gold: #c9a54d;
+  --color-gold-bright: #e0c06e;
+
+  /* ── Color: text ──────────────────────────────────────────────────── */
+  --color-text-primary: #ededed;
+  --color-text-secondary: rgba(237, 237, 237, 0.64);
+  --color-text-tertiary: rgba(237, 237, 237, 0.4);
+  --color-text-on-accent: #ffffff;
+
+  /* ── Color: semantic ──────────────────────────────────────────────── */
+  --color-success: #3fb87f;
+  --color-warning: #d9a441;
+  --color-danger: #c94545;
+  --color-online: #3fb87f;
+
+  /* ── Gradients ────────────────────────────────────────────────────── */
+  --gradient-signature: linear-gradient(115deg, var(--color-gold) 0%, var(--color-crimson) 55%, var(--color-purple) 100%);
+  --gradient-surface-glow: radial-gradient(circle at 50% 0%, rgba(139, 21, 56, 0.16), transparent 60%);
+  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+  /* ── Typography: families ─────────────────────────────────────────── */
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Georgia', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* ── Typography: scale (fluid, clamp-based) ──────────────────────── */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.375rem;
+  --text-xl: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem);
+  --text-2xl: clamp(2.25rem, 1.7rem + 2.2vw, 3.5rem);
+  --text-3xl: clamp(3rem, 2.2rem + 3.2vw, 5rem);
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.08em;
+  --tracking-wider: 0.16em;
+
+  --leading-tight: 1.1;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /* ── Spacing ──────────────────────────────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* ── Radii ────────────────────────────────────────────────────────── */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-full: 999px;
+
+  /* ── Shadows ──────────────────────────────────────────────────────── */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.32);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.52);
+  --shadow-glow-crimson: 0 0 32px rgba(139, 21, 56, 0.35);
+  --shadow-glow-gold: 0 0 24px rgba(201, 165, 77, 0.25);
+
+  /* ── Glassmorphism ────────────────────────────────────────────────── */
+  --glass-blur: 20px;
+  --glass-bg: rgba(17, 17, 17, 0.6);
+  --glass-border: rgba(237, 237, 237, 0.1);
+
+  /* ── Motion ───────────────────────────────────────────────────────── */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --duration-fast: 150ms;
+  --duration-base: 280ms;
+  --duration-slow: 480ms;
+  --duration-lounge: 900ms;
+
+  /* ── Z-index scale ────────────────────────────────────────────────── */
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-sticky: 100;
+  --z-overlay: 500;
+  --z-modal: 600;
+  --z-toast: 700;
+  --z-lounge-gate: 900;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+    --duration-lounge: 0ms;
+  }
+}

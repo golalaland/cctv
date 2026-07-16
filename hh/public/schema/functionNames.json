@@ -1,0 +1,16 @@
+{
+  "_comment": "Canonical Cloud Function deployment name registry. This is the ONLY place a deployed Cloud Function name is typed. Both /functions/index.js and /public/src/shared/constants.js load this file and freeze it into their exports. Every name is prefixed 'cctvMembers' because this product shares the 'dettyverse' Firebase project (and therefore the same Cloud Functions namespace) with another, unrelated product also referred to as CCTV (Cassava Couch e-commerce), which has its own 'cctv-functions' codebase deployed to the same project. Cloud Function names must be globally unique per project+region regardless of which local folder or codebase they were deployed from — an unprefixed name like 'sendMessage' could silently overwrite (or be overwritten by) a same-named function from that other codebase. Never deploy a function under an unprefixed name.",
+
+  "redeemAccessCode": "cctvMembersRedeemAccessCode",
+  "expireSessions": "cctvMembersExpireSessions",
+  "endSession": "cctvMembersEndSession",
+  "syncServerTime": "cctvMembersSyncServerTime",
+  "getCheckoutDetails": "cctvMembersGetCheckoutDetails",
+  "paystackWebhook": "cctvMembersPaystackWebhook",
+  "sendMessage": "cctvMembersSendMessage",
+  "toggleReaction": "cctvMembersToggleReaction",
+  "deleteOwnMessage": "cctvMembersDeleteOwnMessage",
+  "moderateMessage": "cctvMembersModerateMessage",
+  "reportMessage": "cctvMembersReportMessage",
+  "manageAccessPlans": "cctvMembersManageAccessPlans"
+}

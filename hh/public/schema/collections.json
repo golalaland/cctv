@@ -1,0 +1,28 @@
+{
+  "_comment": "Canonical Firestore collection name registry for CCTV. This is the ONLY place collection name strings are typed. Both /src/shared/constants.js (client) and /functions/shared/firestore-helpers.js (Cloud Functions) load this file at runtime and freeze it into their COLLECTIONS export. Never hardcode a collection name string anywhere else in the codebase — import COLLECTIONS from the relevant wrapper instead. Add new collections here first, then reference them from the module that owns them.",
+
+  "USERS": "users",
+  "HOSTS": "hosts",
+  "PROFILES": "profiles",
+  "GUEST_SESSIONS": "guestSessions",
+  "ACCESS_CODES": "accessCodes",
+  "ACCESS_PLANS": "accessPlans",
+  "MESSAGES": "messages",
+  "MESSAGE_REPORTS": "messageReports",
+  "MEDIA": "media",
+  "CATEGORIES": "categories",
+  "NOW_PLAYING": "nowPlaying",
+  "NOTIFICATIONS": "notifications",
+  "COMMISSIONS": "commissions",
+  "AFFILIATE_SALES": "affiliateSales",
+  "PREMIUM_PURCHASES": "premiumPurchases",
+  "LIKES": "likes",
+  "COMMENTS": "comments",
+  "VIEWS": "views",
+  "MODERATION_REPORTS": "moderationReports",
+  "PROCESSED_WEBHOOKS": "processedWebhooks",
+  "CHECKOUT_SESSIONS": "checkoutSessions",
+  "RATE_LIMITS": "rateLimits",
+  "SETTINGS": "settings",
+  "WITHDRAWALS": "withdrawals"
+}
