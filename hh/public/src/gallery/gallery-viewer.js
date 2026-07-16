@@ -212,7 +212,7 @@ function buildInfoBar() {
 
 function buildMediaElement(item) {
   if (item.type === 'video') {
-    return createEl('video', {
+    const video = createEl('video', {
       classNames: ['viewer-media'],
       attrs: {
         src: item.url,
@@ -222,6 +222,12 @@ function buildMediaElement(item) {
         loop: '',
       },
     });
+    // Browsers silently block autoplay-with-sound without a prior user
+    // gesture — muted at least lets it start playing immediately, same
+    // as we already do for grid thumbnails. The visible native controls
+    // let the guest unmute manually if they want sound.
+    video.muted = true;
+    return video;
   }
   return createEl('img', {
     classNames: ['viewer-media'],
