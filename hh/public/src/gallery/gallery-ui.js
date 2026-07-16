@@ -85,9 +85,10 @@ async function mountFilterBar(filterBar, state, onChange) {
   let categories = [];
   try {
     categories = await fetchCategories();
-  } catch {
+  } catch (error) {
     // Non-critical — the bar still shows Photos/Videos toggles even if
-    // categories fail to load.
+    // categories fail to load. Still logged for debugging visibility.
+    console.error('[gallery] Failed to load categories:', error);
   }
 
   function render() {
@@ -185,7 +186,8 @@ async function loadNextPage(grid, state, handleOpen, { replace = false } = {}) {
     if (!state.noMore) {
       showSkeletons(grid, SKELETON_REFILL_COUNT);
     }
-  } catch {
+  } catch (error) {
+    console.error('[gallery] Failed to load media page:', error);
     removeSkeletons(grid);
     grid.appendChild(
       createEl('p', { classNames: ['gallery-error'], text: 'Couldn\u2019t load the gallery. Try again shortly.' })
