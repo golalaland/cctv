@@ -13,5 +13,9 @@
   "deleteOwnMessage": "cctvMembersDeleteOwnMessage",
   "moderateMessage": "cctvMembersModerateMessage",
   "reportMessage": "cctvMembersReportMessage",
-  "manageAccessPlans": "cctvMembersManageAccessPlans"
+  "manageAccessPlans": "cctvMembersManageAccessPlans",
+  "recordMediaView": "cctvMembersRecordMediaView",
+  "toggleMediaLike": "cctvMembersToggleMediaLike",
+  "manageCategories": "cctvMembersManageCategories",
+  "manageMedia": "cctvMembersManageMedia"
 }

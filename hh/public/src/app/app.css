@@ -1,10 +1,13 @@
 /**
  * app.css
  *
- * Layout for the main room shell (top bar + chat panel), mounted by
- * app.js after guest login. Gallery/Now Playing/bottom-nav layout will
- * extend this file when those modules land — kept intentionally minimal
- * for what actually exists today.
+ * Layout for the main room shell (top bar + tab bar + content area),
+ * mounted by app.js after guest login. The content area is generic —
+ * both the chat panel and the gallery panel mount into the same
+ * `.main-room-content` container, torn down and swapped by the tab bar.
+ * Now Playing / full bottom-nav layout will extend this file when those
+ * modules land — kept intentionally minimal for what actually exists
+ * today.
  */
 
 .app-shell {
@@ -49,15 +52,49 @@
   padding: var(--space-2) var(--space-4);
 }
 
-.main-room-chat {
+.main-tab-bar {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.main-tab-btn {
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border: 1px solid transparent;
+  transition: color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    background var(--duration-fast) var(--ease-standard);
+}
+
+.main-tab-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.main-tab-btn-active {
+  color: var(--color-text-on-accent);
+  background: var(--gradient-signature);
+  box-shadow: var(--shadow-glow-crimson);
+}
+
+.main-room-content {
   flex: 1;
   padding: var(--space-4);
   display: flex;
+  min-height: 0;
 }
 
-.main-room-chat .chat-panel {
+.main-room-content .chat-panel {
   flex: 1;
   max-height: none;
+}
+
+.main-room-content .gallery-panel {
+  flex: 1;
 }
 
 @media (max-width: 480px) {
@@ -65,11 +102,15 @@
     padding: var(--space-3) var(--space-4);
   }
 
-  .main-room-chat {
-    padding: 0;
+  .main-tab-bar {
+    padding: var(--space-2) var(--space-4);
   }
 
-  .main-room-chat .chat-panel {
+  .main-room-content {
+    padding: var(--space-3);
+  }
+
+  .main-room-content .chat-panel {
     border-radius: 0;
     border-left: none;
     border-right: none;

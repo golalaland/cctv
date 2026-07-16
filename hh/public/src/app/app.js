@@ -6,11 +6,17 @@
  *   2. Once passed, mount the app shell — either the guest login screen,
  *      or (if a session already exists in sessionStorage, e.g. page
  *      refresh mid-session) straight into the main room.
- *   3. The main room = a small top bar (username, session countdown,
- *      leave button) + the realtime chat panel from the Chat System
- *      module. Gallery / Now Playing / bottom nav don't exist yet — this
- *      is an honest reflection of what's actually built so far, not a
- *      stub pretending to be more.
+ *   3. The main room = top bar (username, session countdown, leave) +
+ *      a two-tab switcher between Chat and Gallery. This is a
+ *      deliberately simple tab bar, not the full bottom navigation
+ *      (Chat/Gallery/TV/Hosts/Profile) described in the original spec —
+ *      that belongs to a later polish pass once Now Playing and Hosts
+ *      exist too and there's enough to actually navigate between.
+ *
+ * Tab switching tears down whichever module is currently mounted
+ * (stopping its Firestore listener / IntersectionObserver) before
+ * mounting the other — neither Chat nor Gallery run in the background
+ * while the other tab is active.
  */
 
 import { mountLoungeGate } from './lounge-gate.js';
@@ -20,6 +26,8 @@ import { startSessionTimer, stopSessionTimer, getFormattedTimeRemaining } from '
 import { hasActiveSession, getUsername, clearSession } from '../guest/session-store.js';
 import { showErrorToast } from '../shared/toast.js';
 import { mountChat } from '../chat/chat-ui.js';
+import { mountGallery } from '../gallery/gallery-ui.js';
+import { openMediaViewer } from '../gallery/gallery-viewer.js';
 
 // Importing firebase-config.js triggers Firebase app initialization and
 // (in development) emulator connection as a side effect.
@@ -54,12 +62,32 @@ function mountAppShell(root) {
 
 function mountMainRoom(shell) {
   const topBar = buildTopBar();
-  const chatContainer = createEl('div', { classNames: ['main-room-chat'] });
+  const tabBar = buildTabBar();
+  const content = createEl('div', { classNames: ['main-room-content'] });
 
   shell.appendChild(topBar.el);
-  shell.appendChild(chatContainer);
+  shell.appendChild(tabBar.el);
+  shell.appendChild(content);
 
-  const teardownChat = mountChat(chatContainer);
+  let activeTeardown = null;
+
+  function mountTab(tab) {
+    if (activeTeardown) activeTeardown();
+    content.innerHTML = '';
+
+    if (tab === 'gallery') {
+      activeTeardown = mountGallery(content, {
+        onMediaOpen: (item, items, index) => openMediaViewer(item, items, index),
+      });
+    } else {
+      activeTeardown = mountChat(content);
+    }
+
+    tabBar.setActive(tab);
+  }
+
+  tabBar.onSelect(mountTab);
+  mountTab('chat');
 
   // Keep the top bar's countdown display in sync with the running timer.
   // startSessionTimer() is already running (either from mountAppShell's
@@ -77,7 +105,7 @@ function mountMainRoom(shell) {
 
   topBar.onLeave(() => {
     clearInterval(badgeIntervalId);
-    teardownChat();
+    if (activeTeardown) activeTeardown();
     stopSessionTimer();
     clearSession();
     window.location.reload();
@@ -113,6 +141,36 @@ function buildTopBar() {
     },
     onLeave(handler) {
       leaveBtn.addEventListener('click', handler);
+    },
+  };
+}
+
+function buildTabBar() {
+  const chatBtn = createEl('button', {
+    classNames: ['main-tab-btn'],
+    attrs: { type: 'button' },
+    text: 'Chat',
+  });
+  const galleryBtn = createEl('button', {
+    classNames: ['main-tab-btn'],
+    attrs: { type: 'button' },
+    text: 'Gallery',
+  });
+
+  const el = createEl('nav', { classNames: ['main-tab-bar'] }, [chatBtn, galleryBtn]);
+
+  let selectHandler = null;
+  chatBtn.addEventListener('click', () => selectHandler?.('chat'));
+  galleryBtn.addEventListener('click', () => selectHandler?.('gallery'));
+
+  return {
+    el,
+    onSelect(handler) {
+      selectHandler = handler;
+    },
+    setActive(tab) {
+      chatBtn.classList.toggle('main-tab-btn-active', tab === 'chat');
+      galleryBtn.classList.toggle('main-tab-btn-active', tab === 'gallery');
     },
   };
 }
