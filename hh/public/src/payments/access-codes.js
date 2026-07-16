@@ -6,12 +6,20 @@
  *   2. On plan selection, call getCheckoutDetails (server-authoritative
  *      price + a fresh Paystack reference).
  *   3. Open Paystack Inline checkout with that exact amount/reference.
- *   4. On Paystack success callback, start a realtime Firestore listener
- *      on checkoutSessions/{reference} — the webhook (running
- *      server-side, asynchronously) will flip its status to "complete"
- *      and attach the plaintext code once processing finishes. This is
- *      the "polling via listener" mechanism described in the approved
- *      architecture: the client never talks to the webhook directly.
+ *   4. Two independent paths race to fulfill the checkout once payment
+ *      succeeds:
+ *        a. FAST: the moment Paystack's popup reports success, this
+ *           module calls verifyPayment directly — a callable that
+ *           re-verifies with Paystack server-side and issues the code
+ *           immediately. This is the primary path in normal operation.
+ *        b. BACKUP: a realtime Firestore listener on
+ *           checkoutSessions/{reference} also stays active the whole
+ *           time, catching the result if the webhook (server-to-server,
+ *           fully independent of the browser) completes first — e.g. if
+ *           the tab closed right as checkout finished, before (a) could
+ *           run.
+ *      Whichever settles first wins; the code below guards against
+ *      double-settling.
  *   5. Once the code arrives, hand it off to the caller (guest-login.js)
  *      to auto-fill the redemption form.
  *
@@ -34,7 +42,7 @@ const CHECKOUT_STATUS = Object.freeze({
   FAILED: 'failed',
 });
 
-/** How long to keep listening for the webhook to finish before giving up client-side. */
+/** How long to keep waiting for either fulfillment path before giving up client-side. */
 const CHECKOUT_TIMEOUT_MS = 90_000;
 
 /**
@@ -45,10 +53,25 @@ export function purchaseAccessPlan({ planId, email, referralCode }) {
   return new Promise((resolve, reject) => {
     let unsubscribe = null;
     let timeoutId = null;
+    let settled = false;
 
     function cleanup() {
       if (unsubscribe) unsubscribe();
       if (timeoutId) clearTimeout(timeoutId);
+    }
+
+    function settleResolve(code) {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(code);
+    }
+
+    function settleReject(error) {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(error);
     }
 
     callFunction(FUNCTION_NAMES.getCheckoutDetails, { planId, referralCode })
@@ -61,40 +84,47 @@ export function purchaseAccessPlan({ planId, email, referralCode }) {
           const checkout = snapshot.data();
 
           if (checkout.status === CHECKOUT_STATUS.COMPLETE && checkout.plaintextCodeForPickup) {
-            cleanup();
-            resolve(checkout.plaintextCodeForPickup);
+            settleResolve(checkout.plaintextCodeForPickup);
           } else if (checkout.status === CHECKOUT_STATUS.FAILED) {
-            cleanup();
-            reject(new Error('Payment could not be verified. If you were charged, contact support with your reference.'));
+            settleReject(new Error('Payment could not be verified. If you were charged, contact support with your reference.'));
           }
         });
 
         timeoutId = setTimeout(() => {
-          cleanup();
-          reject(new Error('This is taking longer than expected. If you were charged, your code will still arrive — check back shortly.'));
+          settleReject(new Error('This is taking longer than expected. If you were charged, your code will still arrive \u2014 check back shortly.'));
         }, CHECKOUT_TIMEOUT_MS);
 
         openPaystackCheckout({
           email,
           amountKobo,
           reference,
-          onSuccess: () => {
-            // Intentionally a no-op beyond this point — the realtime
-            // listener above is what actually resolves the promise,
-            // since Paystack's client-side callback fires on payment
-            // completion, not on OUR webhook having finished processing.
+          onSuccess: async () => {
+            // Fast path: verify directly with the server the moment
+            // Paystack's popup reports success, rather than waiting on
+            // the webhook alone, which can lag by up to an hour in
+            // Paystack's test mode. The realtime listener above stays
+            // active as a backup in case this call itself fails (e.g. a
+            // network hiccup right as the popup closes) — whichever
+            // settles the promise first wins, via the settled guard.
+            try {
+              const { data } = await callFunction(FUNCTION_NAMES.verifyPayment, { reference });
+              if (data.code) {
+                settleResolve(data.code);
+              }
+            } catch {
+              // Swallow — the listener/timeout above still governs the
+              // outcome; this is a best-effort speed-up, not the only path.
+            }
           },
           onClose: () => {
-            // Guest closed the popup without completing payment. Don't
-            // reject immediately — they may have completed it and just
-            // closed the confirmation screen; let the listener/timeout
-            // decide the outcome rather than assuming failure here.
+            // Guest closed the popup, whether before or after completing
+            // payment. Don't reject immediately — let the verify call,
+            // listener, or timeout above decide the actual outcome.
           },
         });
       })
       .catch((error) => {
-        cleanup();
-        reject(error);
+        settleReject(error);
       });
   });
 }
