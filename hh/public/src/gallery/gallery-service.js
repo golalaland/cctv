@@ -22,7 +22,7 @@ import {
   orderBy,
   limit,
   startAfter,
-  getDocs,
+  getDocsFromServer,
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import { db } from '../shared/firebase-config.js';
 import { COLLECTIONS, CONFIG, FUNCTION_NAMES, MEDIA_STATUS } from '../shared/constants.js';
@@ -57,7 +57,16 @@ export async function fetchMediaPage({ categoryId, type, cursor } = {}) {
   constraints.push(limit(CONFIG.GALLERY_PAGE_SIZE));
 
   const mediaQuery = query(collection(db, COLLECTIONS.MEDIA), ...constraints);
-  const snapshot = await getDocs(mediaQuery);
+  // getDocsFromServer, not getDocs — the app's persistent local cache
+  // (enabled for offline support in firebase-config.js) can otherwise
+  // satisfy a read from an old cached snapshot of a document without a
+  // real server round-trip, which caused a real bug: newly-added fields
+  // on an edited document (e.g. adding `url` after the doc already
+  // existed) silently rendering as `undefined` client-side even though
+  // the server copy was correct. Gallery reads are infrequent enough
+  // (paginated, not a hot loop) that always hitting the server here is
+  // the right tradeoff over cache-first reads.
+  const snapshot = await getDocsFromServer(mediaQuery);
 
   const items = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
   const nextCursor =
@@ -75,7 +84,7 @@ export async function fetchCategories() {
     where('active', '==', true),
     orderBy('sortOrder', 'asc')
   );
-  const snapshot = await getDocs(categoriesQuery);
+  const snapshot = await getDocsFromServer(categoriesQuery);
   return snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
 }
 
